@@ -9,12 +9,10 @@ def create_app():
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'static/uploads')
 
-    # Initialize Extensions
     db.init_app(app)
     login_manager.init_app(app)
     login_manager.login_view = 'auth.login'
 
-    # Ensure upload folder exists
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
     from models import User
@@ -23,7 +21,6 @@ def create_app():
     def load_user(user_id):
         return User.query.get(int(user_id))
 
-    # Register Blueprints
     from routes.auth_routes import auth_bp
     from routes.main_routes import main_bp
     from routes.admin_routes import admin_bp
@@ -36,10 +33,13 @@ def create_app():
 
     return app
 
+
+# ⭐ ADD THIS (VERY IMPORTANT FOR VERCEL)
+app = create_app()
+
+
 if __name__ == '__main__':
-    app = create_app()
     with app.app_context():
         db.create_all()
-        # Optional: Seed admin user here if needed
         print("Database initialized.")
     app.run(debug=True)
