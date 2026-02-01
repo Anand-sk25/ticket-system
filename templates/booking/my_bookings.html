@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}My Bookings{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>My Bookings</h2>
+    {% if bookings %}
+    <div class="table-responsive">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead style="background: rgba(255,255,255,0.05);">
+                <tr>
+                    <th style="padding: 1rem; text-align: left;">Event</th>
+                    <th style="padding: 1rem; text-align: left;">Date</th>
+                    <th style="padding: 1rem; text-align: left;">Amount</th>
+                    <th style="padding: 1rem; text-align: left;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for booking in bookings %}
+                <tr style="border-bottom: 1px solid var(--glass-border);">
+                    <td style="padding: 1rem;">{{ booking.event.title }}</td>
+                    <td style="padding: 1rem;">{{ booking.event.date_time.strftime('%b %d, %Y') }}</td>
+                    <td style="padding: 1rem;">${{ booking.total_amount }}</td>
+                    <td style="padding: 1rem;">
+                        <a href="{{ url_for('booking.view_ticket', booking_id=booking.id) }}" class="btn-secondary">View
+                            Ticket</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p>No bookings found.</p>
+    <a href="{{ url_for('main.index') }}" class="btn-primary">Book Now</a>
+    {% endif %}
+</div>
+{% endblock %}

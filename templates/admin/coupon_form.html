@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}New Coupon{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="card">
+        <h2>Add Coupon</h2>
+        <form method="POST">
+            <div class="form-group">
+                <label for="code">Coupon Code</label>
+                <input type="text" id="code" name="code" required placeholder="OFF20">
+            </div>
+            <div class="form-group">
+                <label for="discount">Discount Percentage (%)</label>
+                <input type="number" step="0.1" id="discount" name="discount" required placeholder="20">
+            </div>
+            <div class="form-group">
+                <label for="event_id">Applicable Event (Optional)</label>
+                <select id="event_id" name="event_id">
+                    <option value="">All Events (Global)</option>
+                    {% for event in events %}
+                    <option value="{{ event.id }}">{{ event.title }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn-primary" style="width: 100%;">Create Coupon</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

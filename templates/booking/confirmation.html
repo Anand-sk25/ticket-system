@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Ticket Confirmation{% endblock %}
+
+{% block content %}
+<div class="container" style="text-align: center;">
+    <h1 style="margin-bottom: 2rem;">Booking Confirmed!</h1>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 2rem; justify-content: center;">
+        {% for ticket in booking.tickets %}
+        <div class="ticket"
+            style="background: white; color: #333; width: 300px; border-radius: 16px; overflow: hidden; position: relative;">
+            <div class="ticket-header"
+                style="background: var(--primary-color); color: white; padding: 1.5rem; text-align: left;">
+                <h3 style="margin: 0;">MGM Events</h3>
+                <p style="opacity: 0.8; font-size: 0.9rem;">Ticket ID: {{ ticket.unique_code }}</p>
+            </div>
+
+            <div class="ticket-body" style="padding: 1.5rem; text-align: left;">
+                <h2 style="color: var(--primary-color); margin-bottom: 0.5rem;">{{ booking.event.title }}</h2>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
+                    <div>
+                        <p style="font-size: 0.8rem; color: #666;">DATE</p>
+                        <p style="font-weight: bold;">{{ booking.event.date_time.strftime('%b %d') }}</p>
+                    </div>
+                    <div>
+                        <p style="font-size: 0.8rem; color: #666;">TIME</p>
+                        <p style="font-weight: bold;">{{ booking.event.date_time.strftime('%I:%M %p') }}</p>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 1rem;">
+                    <p style="font-size: 0.8rem; color: #666;">VENUE</p>
+                    <p style="font-weight: bold;">{{ booking.event.venue }}</p>
+                </div>
+
+                <div style="border-top: 2px dashed #ccc; margin: 1rem 0;"></div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <p style="font-size: 0.8rem; color: #666;">ATTENDEE</p>
+                        <p style="font-weight: bold;">{{ booking.user.username }}</p>
+                    </div>
+                    <div>
+                        <p style="font-size: 0.8rem; color: #666;">SEAT</p>
+                        <p style="font-weight: bold; color: var(--primary-color);">{{ ticket.seat_number }}</p>
+                    </div>
+                    <div style="text-align: right;">
+                        <!-- QR Code Points to Verification URL -->
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ url_for('booking.verify_ticket', code=ticket.unique_code, _external=True) }}"
+                            alt="QR">
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <button onclick="window.print()" class="btn-secondary"
+        style="margin-top: 3rem; background: white; color: #333;">Print Tickets</button>
+    <a href="{{ url_for('main.index') }}" class="btn-primary" style="margin-top: 3rem;">Back to Home</a>
+</div>
+{% endblock %}

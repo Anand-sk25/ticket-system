@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<header style="text-align: center; margin-bottom: 3rem; padding: 2rem 0;">
+    <h1 style="font-size: 3rem; margin-bottom: 1rem;">Experience <span class="highlight">MGM Events</span></h1>
+    <p style="font-size: 1.2rem; opacity: 0.8; max-width: 600px; margin: 0 auto;">
+        Discover and book tickets for the most exciting college events, workshops, and performances.
+    </p>
+</header>
+
+<h2 style="margin-bottom: 1.5rem; border-left: 4px solid var(--primary-color); padding-left: 1rem;">Upcoming Events</h2>
+
+{% if events %}
+<div class="events-grid"
+    style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 2rem;">
+    {% for event in events %}
+    <div class="card event-card">
+        <div class="event-image"
+            style="height: 200px; background-color: rgba(255,255,255,0.1); border-radius: 8px; margin-bottom: 1rem; overflow: hidden;">
+            {% if event.image_filename %}
+            <img src="{{ url_for('static', filename='uploads/' + event.image_filename) }}" alt="{{ event.title }}"
+                style="width: 100%; height: 100%; object-fit: cover;">
+            {% else %}
+            <div
+                style="display: flex; align-items: center; justify-content: center; height: 100%; color: rgba(255,255,255,0.3);">
+                <i class="fas fa-calendar-alt fa-3x"></i>
+            </div>
+            {% endif %}
+        </div>
+        <h3>{{ event.title }}</h3>
+        <p style="color: var(--primary-color); font-weight: 600; margin: 0.5rem 0;">
+            <i class="fas fa-calendar"></i> {{ event.date_time.strftime('%b %d, %Y - %I:%M %p') }}
+        </p>
+        <p style="opacity: 0.8; margin-bottom: 1rem;">
+            {{ event.description[:100] }}{% if event.description|length > 100 %}...{% endif %}
+        </p>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: auto;">
+            <span style="font-size: 1.2rem; font-weight: 700;">${{ event.price }}</span>
+            <a href="{{ url_for('booking.select_seats', event_id=event.id) }}" class="btn-primary">Book Now</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="card" style="text-align: center; padding: 3rem;">
+    <i class="fas fa-calendar-times fa-3x" style="margin-bottom: 1rem; opacity: 0.5;"></i>
+    <h3>No Upcoming Events</h3>
+    <p>Stay tuned! exciting events are coming soon.</p>
+</div>
+{% endif %}
+
+{% endblock %}

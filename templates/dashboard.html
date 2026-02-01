@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="row" style="margin-bottom: 2rem;">
+    <div class="col-md-12">
+        <h1>Welcome, <span class="highlight">{{ user.username }}</span></h1>
+        <p>Manage your account and view your upcoming events.</p>
+    </div>
+</div>
+
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <h2>My Bookings</h2>
+        <a href="{{ url_for('main.index') }}" class="btn-primary">Book New Event</a>
+    </div>
+
+    {% if user.bookings %}
+    <div class="table-responsive">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead style="background: rgba(255,255,255,0.05);">
+                <tr>
+                    <th style="padding: 1rem; text-align: left;">Event</th>
+                    <th style="padding: 1rem; text-align: left;">Date</th>
+                    <th style="padding: 1rem; text-align: left;">Venue</th>
+                    <th style="padding: 1rem; text-align: left;">Tickets</th>
+                    <th style="padding: 1rem; text-align: left;">Amount</th>
+                    <th style="padding: 1rem; text-align: left;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for booking in user.bookings|sort(attribute='booking_date', reverse=True) %}
+                <tr style="border-bottom: 1px solid var(--glass-border);">
+                    <td style="padding: 1rem; font-weight: bold;">{{ booking.event.title }}</td>
+                    <td style="padding: 1rem;">{{ booking.event.date_time.strftime('%b %d, %Y %I:%M %p') }}</td>
+                    <td style="padding: 1rem;">{{ booking.event.venue }}</td>
+                    <td style="padding: 1rem;">{{ booking.tickets|length }}</td>
+                    <td style="padding: 1rem;">${{ booking.total_amount }}</td>
+                    <td style="padding: 1rem;">
+                        <a href="{{ url_for('booking.view_ticket', booking_id=booking.id) }}" class="btn-secondary"
+                            style="padding: 0.4rem 0.8rem; font-size: 0.9rem;">View Ticket</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div style="text-align: center; padding: 3rem;">
+        <i class="fas fa-ticket-alt fa-3x" style="margin-bottom: 1rem; opacity: 0.5;"></i>
+        <h3>No Bookings Yet</h3>
+        <p>You haven't booked any events yet.</p>
+        <a href="{{ url_for('main.index') }}" class="btn-primary" style="margin-top: 1rem;">Browse Events</a>
+    </div>
+    {% endif %}
+</div>
+
+<div class="card" style="margin-top: 2rem;">
+    <h2>Account Details</h2>
+    <div
+        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem;">
+        <div>
+            <span style="opacity: 0.7; font-size: 0.9rem;">Full Name</span>
+            <p style="font-weight: 500;">{{ user.username }}</p>
+        </div>
+        <div>
+            <span style="opacity: 0.7; font-size: 0.9rem;">Email</span>
+            <p style="font-weight: 500;">{{ user.email }}</p>
+        </div>
+        <div>
+            <span style="opacity: 0.7; font-size: 0.9rem;">Phone</span>
+            <p style="font-weight: 500;">{{ user.phone or 'Not provided' }}</p>
+        </div>
+        <div>
+            <span style="opacity: 0.7; font-size: 0.9rem;">Branch/Dept</span>
+            <p style="font-weight: 500;">{{ user.branch }} / {{ user.department }}</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
