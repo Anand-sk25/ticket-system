@@ -16,7 +16,16 @@ def create_app():
         db_path = os.path.join(app.instance_path, 'mgm_events.db')
         upload_path = os.path.join(app.root_path, 'static/uploads')
 
-    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
+    # Database Configuration
+    DATABASE_URL = os.environ.get('DATABASE_URL')
+    if DATABASE_URL:
+        # Fix for Heroku/Vercel Postgres URLs which might start with postgres:// instead of postgresql://
+        if DATABASE_URL.startswith("postgres://"):
+            DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+        app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
+    else:
+        app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
+        
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['UPLOAD_FOLDER'] = upload_path
 
@@ -49,16 +58,32 @@ def create_app():
     app.register_blueprint(admin_bp)
     app.register_blueprint(booking_bp)
 
-    # Initialize database if on Vercel
-    if IS_VERCEL:
-        with app.app_context():
-            db.create_all()
+    # Initialize database and seed admin
+    with app.app_context():
+        db.create_all()
+        
+        # Auto-seed admin from environment variables if they exist
+        admin_email = os.environ.get('ADMIN_EMAIL')
+        admin_password = os.environ.get('ADMIN_PASSWORD')
+        if admin_email and admin_password:
+            from werkzeug.security import generate_password_hash
+            admin = User.query.filter_by(email=admin_email).first()
+            if not admin:
+                new_admin = User(
+                    username='admin',
+                    email=admin_email,
+                    password_hash=generate_password_hash(admin_password),
+                    is_admin=True,
+                    branch='Admin',
+                    department='Administration'
+                )
+                db.session.add(new_admin)
+                db.session.commit()
+                print(f"Admin {admin_email} created via environment variables.")
 
     return app
 
 app = create_app()
 
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
     app.run(debug=True)
