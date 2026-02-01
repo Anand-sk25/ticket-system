@@ -12,15 +12,10 @@
         </div>
         <h2 style="color: #4ade80;">Valid Ticket</h2>
 
-        {% if first_scan %}
-        <div
-            style="background: rgba(74, 222, 128, 0.2); color: #4ade80; padding: 0.5rem; border-radius: 4px; display: inline-block; margin-top: 0.5rem; font-weight: bold;">
-            <i class="fas fa-check-circle"></i> FIRST SCAN SUCCESSFUL
-        </div>
-        {% else %}
+        {% if not first_scan %}
         <div
             style="background: rgba(251, 191, 36, 0.2); color: #fbbf24; padding: 0.5rem; border-radius: 4px; display: inline-block; margin-top: 0.5rem; font-weight: bold; border: 1px solid #fbbf24;">
-            <i class="fas fa-exclamation-triangle"></i> ALREADY SCANNED
+            <i class="fas fa-exclamation-triangle"></i> ALREADY SCANNED ONCE
         </div>
         <p style="color: #fbbf24; font-size: 0.9rem; margin-top: 0.5rem;">
             This ticket was already used on {{ ticket.scanned_at.strftime('%b %d at %I:%M %p') }}
