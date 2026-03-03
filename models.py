@@ -21,6 +21,7 @@ class Event(db.Model):
     venue = db.Column(db.String(200), nullable=False)
     price = db.Column(db.Float, nullable=False)
     image_filename = db.Column(db.String(200), nullable=True)
+    organized_by = db.Column(db.String(100), nullable=True)
     total_seats = db.Column(db.Integer, default=100)
     # We will manage seats dynamically or via Seat model if specific seat locking is required
     seats = db.relationship('Seat', backref='event', lazy=True, cascade='all, delete-orphan')
@@ -41,7 +42,7 @@ class Booking(db.Model):
     event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=False)
     booking_date = db.Column(db.DateTime, default=datetime.utcnow)
     total_amount = db.Column(db.Float, nullable=False)
-    status = db.Column(db.String(20), default='confirmed')
+    status = db.Column(db.String(20), default='pending')
     tickets = db.relationship('Ticket', backref='booking', lazy=True, cascade='all, delete-orphan')
 
 class Ticket(db.Model):

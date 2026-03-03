@@ -71,6 +71,7 @@
     const EVENT_ID = {{ event.id }};
     const PRICE_PER_SEAT = {{ event.price }};
     const BOOKED_SEATS = {{ booked_seats| tojson }};
+    const TOTAL_SEATS = {{ event.total_seats }};
 </script>
 <script src="{{ url_for('static', filename='js/seat_booking.js') }}"></script>
 {% endblock %}

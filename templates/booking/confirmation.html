@@ -4,8 +4,18 @@
 
 {% block content %}
 <div class="container" style="text-align: center;">
+    {% if booking.status == 'confirmed' %}
     <h1 style="margin-bottom: 2rem;">Booking Confirmed!</h1>
+    {% else %}
+    <h1 style="margin-bottom: 2rem;">Booking Pending Approval</h1>
+    <div class="card"
+        style="background: rgba(251, 191, 36, 0.1); border: 1px solid #fbbf24; color: #fbbf24; margin-bottom: 2rem; padding: 1.5rem;">
+        <i class="fas fa-clock"></i> Your booking has been received and is waiting for admin approval. You will be able
+        to view and print your tickets once approved.
+    </div>
+    {% endif %}
 
+    {% if booking.status == 'confirmed' %}
     <div style="display: flex; flex-wrap: wrap; gap: 2rem; justify-content: center;">
         {% for ticket in booking.tickets %}
         <div class="ticket"
@@ -34,6 +44,11 @@
                     <p style="font-weight: bold;">{{ booking.event.venue }}</p>
                 </div>
 
+                <div style="margin-bottom: 1rem;">
+                    <p style="font-size: 0.8rem; color: #666;">ORGANIZED BY</p>
+                    <p style="font-weight: bold;">{{ booking.event.organized_by or 'MGM Events' }}</p>
+                </div>
+
                 <div style="border-top: 2px dashed #ccc; margin: 1rem 0;"></div>
 
                 <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -58,6 +73,7 @@
 
     <button onclick="window.print()" class="btn-secondary"
         style="margin-top: 3rem; background: white; color: #333;">Print Tickets</button>
+    {% endif %}
     <a href="{{ url_for('main.index') }}" class="btn-primary" style="margin-top: 3rem;">Back to Home</a>
 </div>
 {% endblock %}

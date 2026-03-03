@@ -17,6 +17,12 @@
                 style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid var(--glass-border); background: rgba(255,255,255,0.05); color: white; min-height: 100px;">{{ event.description if event else '' }}</textarea>
         </div>
 
+        <div class="form-group">
+            <label for="organized_by">Organized By</label>
+            <input type="text" id="organized_by" name="organized_by"
+                value="{{ event.organized_by if event and event.organized_by else '' }}">
+        </div>
+
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
             <div class="form-group">
                 <label for="date_time">Date & Time</label>

@@ -13,6 +13,7 @@
                     <th style="padding: 1rem; text-align: left;">Event</th>
                     <th style="padding: 1rem; text-align: left;">Date</th>
                     <th style="padding: 1rem; text-align: left;">Amount</th>
+                    <th style="padding: 1rem; text-align: left;">Status</th>
                     <th style="padding: 1rem; text-align: left;">Action</th>
                 </tr>
             </thead>
@@ -23,8 +24,22 @@
                     <td style="padding: 1rem;">{{ booking.event.date_time.strftime('%b %d, %Y') }}</td>
                     <td style="padding: 1rem;">${{ booking.total_amount }}</td>
                     <td style="padding: 1rem;">
+                        {% if booking.status == 'confirmed' %}
+                        <span style="color: #4ade80;"><i class="fas fa-check-circle"></i> Confirmed</span>
+                        {% elif booking.status == 'pending' %}
+                        <span style="color: #fbbf24;"><i class="fas fa-clock"></i> Pending</span>
+                        {% else %}
+                        <span style="color: #fb7185;"><i class="fas fa-times-circle"></i> Rejected</span>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 1rem;">
+                        {% if booking.status == 'confirmed' %}
                         <a href="{{ url_for('booking.view_ticket', booking_id=booking.id) }}" class="btn-secondary">View
                             Ticket</a>
+                        {% else %}
+                        <button class="btn-secondary" style="opacity: 0.5; cursor: not-allowed;" disabled>View
+                            Ticket</button>
+                        {% endif %}
                     </td>
                 </tr>
                 {% endfor %}

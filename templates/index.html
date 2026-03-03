@@ -4,7 +4,7 @@
 
 {% block content %}
 <header style="text-align: center; margin-bottom: 3rem; padding: 2rem 0;">
-    <h1 style="font-size: 3rem; margin-bottom: 1rem;">Experience <span class="highlight">MGM Events</span></h1>
+    <h1 style="font-size: 3rem; margin-bottom: 1rem;">MGM <span class="highlight">Events Portal</span></h1>
     <p style="font-size: 1.2rem; opacity: 0.8; max-width: 600px; margin: 0 auto;">
         Discover and book tickets for the most exciting college events, workshops, and performances.
     </p>
@@ -38,7 +38,11 @@
         </p>
         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: auto;">
             <span style="font-size: 1.2rem; font-weight: 700;">${{ event.price }}</span>
+            {% if event.is_past %}
+            <button class="btn-secondary" style="cursor: not-allowed; opacity: 0.6;" disabled>Event Passed</button>
+            {% else %}
             <a href="{{ url_for('booking.select_seats', event_id=event.id) }}" class="btn-primary">Book Now</a>
+            {% endif %}
         </div>
     </div>
     {% endfor %}

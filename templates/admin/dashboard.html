@@ -12,6 +12,49 @@
     </div>
 </div>
 
+<div class="card" style="margin-bottom: 2rem; border-left: 5px solid #fbbf24;">
+    <h2 style="margin-bottom: 1rem; color: #fbbf24;"><i class="fas fa-clock"></i> Pending Approvals</h2>
+    <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; min-width: 600px;">
+            <thead style="background: rgba(255,255,255,0.05);">
+                <tr>
+                    <th style="padding: 1rem; text-align: left;">Time</th>
+                    <th style="padding: 1rem; text-align: left;">Event</th>
+                    <th style="padding: 1rem; text-align: left;">User</th>
+                    <th style="padding: 1rem; text-align: left;">Amount</th>
+                    <th style="padding: 1rem; text-align: left;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for booking in pending_bookings %}
+                <tr style="border-bottom: 1px solid var(--glass-border);">
+                    <td style="padding: 1rem;">{{ booking.booking_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td style="padding: 1rem;">{{ booking.event.title }}</td>
+                    <td style="padding: 1rem;">{{ booking.user.username }}</td>
+                    <td style="padding: 1rem;">${{ booking.total_amount }}</td>
+                    <td style="padding: 1rem;">
+                        <form action="{{ url_for('admin.approve_booking', booking_id=booking.id) }}" method="POST"
+                            style="display: inline;">
+                            <button type="submit" class="btn-primary"
+                                style="padding: 0.4rem 0.8rem; font-size: 0.8rem; background: #4ade80;">Approve</button>
+                        </form>
+                        <form action="{{ url_for('admin.reject_booking', booking_id=booking.id) }}" method="POST"
+                            style="display: inline;">
+                            <button type="submit" class="btn-secondary"
+                                style="padding: 0.4rem 0.8rem; font-size: 0.8rem; background: #fb7185; border-color: #fb7185; color: white;">Reject</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" style="padding: 1rem; text-align: center;">No pending approvals.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
 <div class="card" style="margin-bottom: 2rem;">
     <h2 style="margin-bottom: 1rem;">Manage Events</h2>
     <div style="overflow-x: auto;">
@@ -22,16 +65,28 @@
                     <th style="padding: 1rem; text-align: left;">Date</th>
                     <th style="padding: 1rem; text-align: left;">Price</th>
                     <th style="padding: 1rem; text-align: left;">Seats</th>
+                    <th style="padding: 1rem; text-align: left;">Organized By</th>
                     <th style="padding: 1rem; text-align: left;">Actions</th>
                 </tr>
             </thead>
             <tbody>
                 {% for event in events %}
                 <tr style="border-bottom: 1px solid var(--glass-border);">
-                    <td style="padding: 1rem;">{{ event.title }}</td>
+                    <td style="padding: 1rem;">
+                        {{ event.title }}
+                        {% if event.is_past %}
+                        <span
+                            style="font-size: 0.7rem; padding: 0.2rem 0.5rem; background: rgba(252, 165, 165, 0.2); color: #fca5a5; border-radius: 4px; margin-left: 0.5rem;">
+                            Passed</span>
+                        {% else %}
+                        <span
+                            style="font-size: 0.7rem; padding: 0.2rem 0.5rem; background: rgba(74, 222, 128, 0.2); color: #4ade80; border-radius: 4px; margin-left: 0.5rem;">Live</span>
+                        {% endif %}
+                    </td>
                     <td style="padding: 1rem;">{{ event.date_time.strftime('%Y-%m-%d %H:%M') }}</td>
                     <td style="padding: 1rem;">${{ event.price }}</td>
                     <td style="padding: 1rem;">{{ event.total_seats }}</td>
+                    <td style="padding: 1rem;">{{ event.organized_by or '-' }}</td>
                     <td style="padding: 1rem;">
                         <a href="{{ url_for('admin.edit_event', event_id=event.id) }}"
                             style="color: var(--primary-color); margin-right: 1rem;"><i class="fas fa-edit"></i></a>
@@ -46,6 +101,49 @@
                 {% else %}
                 <tr>
                     <td colspan="5" style="padding: 1rem; text-align: center;">No events found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="card" style="margin-bottom: 2rem;">
+    <h2 style="margin-bottom: 1rem;">Recent Purchases & Scans</h2>
+    <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; min-width: 600px;">
+            <thead style="background: rgba(255,255,255,0.05);">
+                <tr>
+                    <th style="padding: 1rem; text-align: left;">Time</th>
+                    <th style="padding: 1rem; text-align: left;">Event</th>
+                    <th style="padding: 1rem; text-align: left;">Member</th>
+                    <th style="padding: 1rem; text-align: left;">Seat</th>
+                    <th style="padding: 1rem; text-align: left;">Status</th>
+                    <th style="padding: 1rem; text-align: left;">Scanned At</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ticket, booking, event, user in recent_tickets %}
+                <tr style="border-bottom: 1px solid var(--glass-border);">
+                    <td style="padding: 1rem;">{{ ticket.generated_at.strftime('%Y-%m-%d %H:%M') if ticket.generated_at
+                        else '-' }}</td>
+                    <td style="padding: 1rem;">{{ event.title }}</td>
+                    <td style="padding: 1rem;">{{ user.username }} ({{ user.email }})</td>
+                    <td style="padding: 1rem;">{{ ticket.seat_number or 'N/A' }}</td>
+                    <td style="padding: 1rem;">
+                        {% if ticket.is_scanned %}
+                        <span style="color: #4ade80;"><i class="fas fa-check-circle"></i> Scanned</span>
+                        {% else %}
+                        <span style="color: #fca5a5;"><i class="fas fa-times-circle"></i> Unscanned</span>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 1rem;">
+                        {{ ticket.scanned_at.strftime('%Y-%m-%d %H:%M') if ticket.scanned_at else '-' }}
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" style="padding: 1rem; text-align: center;">No recent tickets found.</td>
                 </tr>
                 {% endfor %}
             </tbody>

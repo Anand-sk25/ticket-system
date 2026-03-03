@@ -11,6 +11,11 @@ booking_bp = Blueprint('booking', __name__, url_prefix='/book')
 @login_required
 def select_seats(event_id):
     event = Event.query.get_or_404(event_id)
+    
+    if event.date_time < datetime.now():
+        flash('This event has already passed and tickets can no longer be booked.', 'error')
+        return redirect(url_for('main.index'))
+        
     # Fetch all seats for this event from the Seat model
     seats = Seat.query.filter_by(event_id=event_id).all()
     booked_seats = [f"{s.row}{s.number}" for s in seats if s.status == 'booked']
@@ -26,6 +31,9 @@ def confirm_booking():
     
     event = Event.query.get_or_404(event_id)
     
+    if event.date_time < datetime.now():
+        return jsonify({'status': 'error', 'message': 'This event has already passed. Booking is closed.'}), 400
+        
     # Calculate total
     total_amount = len(selected_seats) * event.price
     
@@ -34,7 +42,7 @@ def confirm_booking():
         user_id=current_user.id,
         event_id=event.id,
         total_amount=total_amount,
-        status='confirmed' # For demo, auto-confirm
+        status='pending'
     )
     db.session.add(booking)
     db.session.commit()
@@ -74,6 +82,10 @@ def view_ticket(booking_id):
     if booking.user_id != current_user.id and not current_user.is_admin:
         flash('Unauthorized', 'error')
         return redirect(url_for('main.index'))
+    
+    if booking.status != 'confirmed' and not current_user.is_admin:
+        flash('Your booking is pending admin approval. Tickets will be available once approved.', 'info')
+        return redirect(url_for('booking.my_bookings'))
         
     return render_template('booking/confirmation.html', booking=booking)
 

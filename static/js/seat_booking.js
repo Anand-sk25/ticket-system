@@ -1,24 +1,39 @@
 document.addEventListener('DOMContentLoaded', function () {
     const seatMap = document.getElementById('seat-map');
-    const rows = 6;
-    const cols = 8;
     const selectedSeats = new Set();
 
+    let cols = 10;
+    let r = 0;
+    let totalCreated = 0;
+    let totalSeats = typeof TOTAL_SEATS !== 'undefined' ? TOTAL_SEATS : 48; // Default if not provided
+
+    function getRowLabel(idx) {
+        let res = "";
+        while (idx >= 0) {
+            res = String.fromCharCode(65 + (idx % 26)) + res;
+            idx = Math.floor(idx / 26) - 1;
+        }
+        return res;
+    }
+
     // Generate Seats
-    for (let r = 0; r < rows; r++) {
+    while (totalCreated < totalSeats) {
         const rowDiv = document.createElement('div');
         rowDiv.style.display = 'flex';
         rowDiv.style.gap = '0.5rem';
 
-        const rowLabel = String.fromCharCode(65 + r); // A, B, C...
+        const rowLabel = getRowLabel(r);
 
         for (let c = 1; c <= cols; c++) {
+            if (totalCreated >= totalSeats) break;
+
             const seatId = `${rowLabel}${c}`;
             const seat = document.createElement('div');
             seat.className = 'seat';
             seat.dataset.id = seatId;
             seat.innerText = '';
             seat.title = `Seat ${seatId}`;
+            totalCreated++;
 
             // Check if seat is really booked
             if (BOOKED_SEATS.includes(seatId)) {
@@ -43,6 +58,7 @@ document.addEventListener('DOMContentLoaded', function () {
             rowDiv.appendChild(seat);
         }
         seatMap.appendChild(rowDiv);
+        r++;
     }
 
     window.toggleSeat = function (seat) {
