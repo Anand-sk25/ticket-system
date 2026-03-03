@@ -20,7 +20,10 @@
         <div class="logo">
             <a href="{{ url_for('main.index') }}">MGM<span class="highlight">Events</span></a>
         </div>
-        <div class="nav-links">
+        <button class="menu-toggle" id="menu-toggle">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="nav-links" id="nav-links">
             <a href="{{ url_for('main.index') }}">Home</a>
             {% if current_user.is_authenticated %}
             <a href="{{ url_for('main.dashboard') }}">Dashboard</a>
@@ -55,6 +58,12 @@
     <footer>
         <p>&copy; 2026 MGM Events. All rights reserved.</p>
     </footer>
+
+    <script>
+        document.getElementById('menu-toggle').addEventListener('click', function () {
+            document.getElementById('nav-links').classList.toggle('active');
+        });
+    </script>
 </body>
 
 </html>

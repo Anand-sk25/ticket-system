@@ -19,8 +19,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Generate Seats
     while (totalCreated < totalSeats) {
         const rowDiv = document.createElement('div');
-        rowDiv.style.display = 'flex';
-        rowDiv.style.gap = '0.5rem';
+        rowDiv.className = 'seat-row';
 
         const rowLabel = getRowLabel(r);
 
@@ -42,19 +41,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 seat.onclick = () => toggleSeat(seat);
             }
 
-            seat.style.width = '30px';
-            seat.style.height = '30px';
-            seat.style.borderRadius = '6px';
-            seat.style.background = 'rgba(255,255,255,0.1)';
-            seat.style.border = '1px solid rgba(255,255,255,0.2)';
-            seat.style.cursor = 'pointer';
-            seat.style.transition = 'all 0.2s';
-
-            if (seat.classList.contains('booked')) {
-                seat.style.background = 'rgba(255,255,255,0.3)';
-                seat.style.cursor = 'not-allowed';
-            }
-
             rowDiv.appendChild(seat);
         }
         seatMap.appendChild(rowDiv);
@@ -67,10 +53,10 @@ document.addEventListener('DOMContentLoaded', function () {
         const seatId = seat.dataset.id;
         if (selectedSeats.has(seatId)) {
             selectedSeats.delete(seatId);
-            seat.style.background = 'rgba(255,255,255,0.1)';
+            seat.classList.remove('selected');
         } else {
             selectedSeats.add(seatId);
-            seat.style.background = '#6366f1'; // Primary color
+            seat.classList.add('selected');
         }
         updateSummary();
     };
