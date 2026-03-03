@@ -7,12 +7,17 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 # --- CONFIGURATION ---
-# Replace with your actual database URL from Vercel
-# Format: postgres://user:password@host/dbname
-LIVE_DATABASE_URL = input("Enter your LIVE DATABASE_URL from Vercel: ").strip()
+# Live Database URL
+# You can find this in your Vercel Dashboard -> Storage -> Postgres -> .env.local
+# It should look like: postgresql://default:password@host.postgres.vercel-storage.com:5432/verceldb
+LIVE_DATABASE_URL = input("\n[STEP 1] Enter your Vercel DATABASE_URL (or press Enter to skip): ").strip()
 
 if not LIVE_DATABASE_URL:
-    print("Error: No URL provided.")
+    print("No URL provided. Seeking from environment variable...")
+    LIVE_DATABASE_URL = os.environ.get('DATABASE_URL')
+    
+if not LIVE_DATABASE_URL:
+    print("Error: No DATABASE_URL found. Please provide it to sync data.")
     exit()
 
 if LIVE_DATABASE_URL.startswith("postgres://"):

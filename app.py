@@ -62,24 +62,34 @@ def create_app():
     with app.app_context():
         db.create_all()
         
-        # Auto-seed admin from environment variables if they exist
-        admin_email = os.environ.get('ADMIN_EMAIL')
-        admin_password = os.environ.get('ADMIN_PASSWORD')
-        if admin_email and admin_password:
-            from werkzeug.security import generate_password_hash
-            admin = User.query.filter_by(email=admin_email).first()
-            if not admin:
-                new_admin = User(
-                    username='admin',
-                    email=admin_email,
-                    password_hash=generate_password_hash(admin_password),
-                    is_admin=True,
-                    branch='Admin',
-                    department='Administration'
-                )
-                db.session.add(new_admin)
-                db.session.commit()
-                print(f"Admin {admin_email} created via environment variables.")
+        # Auto-seed admin from environment variables or default email
+        admin_email = os.environ.get('ADMIN_EMAIL') or 'ask208238@gmail.com'
+        admin_password = os.environ.get('ADMIN_PASSWORD') or 'admin123'
+        
+        from werkzeug.security import generate_password_hash
+        admin = User.query.filter_by(email=admin_email).first()
+        if not admin:
+            new_admin = User(
+                username='admin',
+                email=admin_email,
+                password_hash=generate_password_hash(admin_password),
+                is_admin=True,
+                branch='Admin',
+                department='Administration'
+            )
+            db.session.add(new_admin)
+            db.session.commit()
+            print(f"Admin {admin_email} created.")
+        elif not admin.is_admin:
+            admin.is_admin = True
+            db.session.commit()
+            print(f"User {admin_email} promoted to Admin.")
+
+        # Check for persistence warning
+        if IS_VERCEL and not DATABASE_URL:
+            app.config['PERSISTENCE_WARNING'] = True
+        else:
+            app.config['PERSISTENCE_WARNING'] = False
 
     return app
 

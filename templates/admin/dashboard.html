@@ -12,6 +12,20 @@
     </div>
 </div>
 
+{% if config.PERSISTENCE_WARNING %}
+<div class="card" style="margin-bottom: 2rem; border-left: 5px solid #ef4444; background: rgba(239, 68, 68, 0.1);">
+    <h2 style="margin-bottom: 0.5rem; color: #fca5a5;"><i class="fas fa-exclamation-triangle"></i> Data Persistence
+        Warning</h2>
+    <p style="color: #fca5a5; font-size: 0.9rem;">
+        You are currently using a temporary SQLite database on Vercel.
+        <strong>All data (events, bookings, users) will be DELETED</strong> whenever the site restarts or redeploys.
+    </p>
+    <p style="color: #fca5a5; font-size: 0.9rem; margin-top: 0.5rem;">
+        To fix this, please connect a <strong>Vercel Postgres</strong> database in your Vercel dashboard.
+    </p>
+</div>
+{% endif %}
+
 <div class="card" style="margin-bottom: 2rem; border-left: 5px solid #fbbf24;">
     <h2 style="margin-bottom: 1rem; color: #fbbf24;"><i class="fas fa-clock"></i> Pending Approvals</h2>
     <div style="overflow-x: auto;">
