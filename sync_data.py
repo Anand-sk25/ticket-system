@@ -54,17 +54,25 @@ def migrate():
     live_session = Session()
 
     try:
-        # 1. Clear Live Tables (Optional, but recommended for clean sync)
-        confirm = input("Clear all data in LIVE database before syncing? (y/n): ")
+        # 1. Clear or Recreate Live Tables (to handle schema changes)
+        print("\n[STEP 2] Preparing Live Database...")
+        confirm = input("Recreate all tables in LIVE database? (Highly recommended if you see 'column does not exist' errors) (y/n): ")
         if confirm.lower() == 'y':
-            print("Cleaning live database...")
-            live_session.query(Ticket).delete()
-            live_session.query(Booking).delete()
-            live_session.query(Seat).delete()
-            live_session.query(Coupon).delete()
-            live_session.query(Event).delete()
-            live_session.query(User).delete()
-            live_session.commit()
+            print("Dropping and recreating all tables...")
+            from extensions import db as ext_db
+            ext_db.metadata.drop_all(engine)
+            ext_db.metadata.create_all(engine)
+        else:
+            confirm_clear = input("Just clear existing data in LIVE database? (y/n): ")
+            if confirm_clear.lower() == 'y':
+                print("Cleaning data...")
+                live_session.query(Ticket).delete()
+                live_session.query(Booking).delete()
+                live_session.query(Seat).delete()
+                live_session.query(Coupon).delete()
+                live_session.query(Event).delete()
+                live_session.query(User).delete()
+        live_session.commit()
 
         # 2. Sync Users
         print("Syncing Users...")
@@ -81,7 +89,8 @@ def migrate():
         for e in events:
             new_e = Event(id=e['id'], title=e['title'], description=e['description'], 
                           date_time=e['date_time'], venue=e['venue'], price=e['price'], 
-                          image_filename=e['image_filename'], total_seats=e['total_seats'])
+                          image_filename=e['image_filename'], organized_by=e['organized_by'], 
+                          total_seats=e['total_seats'])
             live_session.merge(new_e)
 
         # 4. Sync Seats

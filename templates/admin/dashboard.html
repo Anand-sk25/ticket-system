@@ -75,6 +75,7 @@
         <table style="width: 100%; border-collapse: collapse; min-width: 600px;">
             <thead style="background: rgba(255,255,255,0.05);">
                 <tr>
+                    <th style="padding: 1rem; text-align: left;">Image</th>
                     <th style="padding: 1rem; text-align: left;">Title</th>
                     <th style="padding: 1rem; text-align: left;">Date</th>
                     <th style="padding: 1rem; text-align: left;">Price</th>
@@ -86,6 +87,18 @@
             <tbody>
                 {% for event in events %}
                 <tr style="border-bottom: 1px solid var(--glass-border);">
+                    <td style="padding: 1rem;">
+                        {% if event.image_filename %}
+                        <img src="{{ url_for('main.uploaded_file', filename=event.image_filename) }}"
+                            alt="{{ event.title }}"
+                            style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
+                        {% else %}
+                        <div
+                            style="width: 50px; height: 50px; background: rgba(255,255,255,0.1); border-radius: 4px; display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.3);">
+                            <i class="fas fa-image"></i>
+                        </div>
+                        {% endif %}
+                    </td>
                     <td style="padding: 1rem;">
                         {{ event.title }}
                         {% if event.is_past %}

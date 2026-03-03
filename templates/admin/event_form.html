@@ -25,7 +25,7 @@
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
             <div class="form-group">
-                <label for="date_time">Date & Time</label>
+                <label for="date_time">Event Timing</label>
                 <input type="datetime-local" id="date_time" name="date_time" required
                     value="{{ event.date_time.strftime('%Y-%m-%dT%H:%M') if event else '' }}">
             </div>
@@ -50,11 +50,38 @@
 
         <div class="form-group">
             <label for="image">Event Image</label>
-            <input type="file" id="image" name="image" accept="image/*">
+            <input type="file" id="image" name="image" accept="image/*" onchange="previewImage(this)">
             {% if event and event.image_filename %}
-            <p>Current image: {{ event.image_filename }}</p>
+            <div style="margin-top: 1rem;">
+                <p style="margin-bottom: 0.5rem; font-size: 0.9rem; opacity: 0.7;">Current Image:</p>
+                <img id="image-preview" src="{{ url_for('main.uploaded_file', filename=event.image_filename) }}"
+                    alt="Preview" style="max-width: 200px; border-radius: 8px; border: 1px solid var(--glass-border);">
+            </div>
+            {% else %}
+            <div id="new-preview-container" style="margin-top: 1rem; display: none;">
+                <p style="margin-bottom: 0.5rem; font-size: 0.9rem; opacity: 0.7;">New Image Preview:</p>
+                <img id="image-preview" src="#" alt="Preview"
+                    style="max-width: 200px; border-radius: 8px; border: 1px solid var(--glass-border);">
+            </div>
             {% endif %}
         </div>
+
+        <script>
+            function previewImage(input) {
+                const preview = document.getElementById('image-preview');
+                const container = document.getElementById('new-preview-container');
+                if (input.files && input.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        if (preview) {
+                            preview.src = e.target.result;
+                            if (container) container.style.display = 'block';
+                        }
+                    }
+                    reader.readAsDataURL(input.files[0]);
+                }
+            }
+        </script>
 
         <button type="submit" class="btn-primary">{% if event %}Update Event{% else %}Create Event{% endif %}</button>
         <a href="{{ url_for('admin.dashboard') }}" class="btn-secondary">Cancel</a>
