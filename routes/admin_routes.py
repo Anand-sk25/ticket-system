@@ -210,6 +210,29 @@ def edit_event(event_id):
         
     return render_template('admin/event_form.html', event=event)
 
+@admin_bp.route('/reset_sequences')
+@login_required
+@admin_required
+def reset_sequences():
+    """Utility to reset Postgres sequences when IDs get out of sync."""
+    if 'postgresql' not in current_app.config['SQLALCHEMY_DATABASE_URI']:
+        flash('Sequence reset only needed for PostgreSQL.', 'info')
+        return redirect(url_for('admin.dashboard'))
+        
+    try:
+        # Reset sequences for all tables
+        tables = ['user', 'event', 'seat', 'booking', 'ticket', 'coupon']
+        for table in tables:
+            db.session.execute(db.text(f"SELECT setval(pg_get_serial_sequence('\"{table}\"', 'id'), coalesce(max(id), 1), max(id) IS NOT null) FROM \"{table}\";"))
+        db.session.commit()
+        flash('Database sequences synchronized successfully!', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error resetting sequences: {str(e)}', 'error')
+        
+    return redirect(url_for('admin.dashboard'))
+
+
 @admin_bp.route('/event/delete/<int:event_id>', methods=['POST'])
 @login_required
 @admin_required
