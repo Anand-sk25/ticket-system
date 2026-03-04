@@ -44,8 +44,8 @@ def register():
             return redirect(url_for('auth.login'))
         except Exception as e:
             db.session.rollback()
-            flash('An error occurred during registration. Please try again.', 'error')
-            print(f"Error: {e}")
+            flash(f'An error occurred: {str(e)}', 'error')
+            print(f"Registration Error: {e}")
             return redirect(url_for('auth.register'))
         
     return render_template('auth/register.html')
