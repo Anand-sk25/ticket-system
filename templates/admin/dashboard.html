@@ -3,10 +3,15 @@
 {% block title %}Admin Dashboard{% endblock %}
 
 {% block content %}
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+<div
+    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
     <h1>Admin Dashboard</h1>
-    <div>
-        <a href="{{ url_for('admin.new_event') }}" class="btn-primary"><i class="fas fa-plus"></i> Add Event</a>
+    <div style="display: flex; gap: 1rem;">
+        <a href="{{ url_for('admin.reset_sequences') }}" class="btn-secondary"
+            style="background: rgba(251, 191, 36, 0.1); border: 1px solid #fbbf24; color: #fbbf24;">
+            <i class="fas fa-sync-alt"></i> Fix Database Sync
+        </a>
+        <a href="{{ url_for('admin.new_event') }}" class="btn-primary">Add New Event</a>
         <a href="{{ url_for('booking.scanner') }}" class="btn-secondary" style="border-color: var(--primary-color);"><i
                 class="fas fa-qrcode"></i> Scanner</a>
     </div>

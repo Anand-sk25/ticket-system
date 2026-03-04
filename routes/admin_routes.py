@@ -214,21 +214,36 @@ def edit_event(event_id):
 @login_required
 @admin_required
 def reset_sequences():
-    """Utility to reset Postgres sequences when IDs get out of sync."""
-    if 'postgresql' not in current_app.config['SQLALCHEMY_DATABASE_URI']:
-        flash('Sequence reset only needed for PostgreSQL.', 'info')
+    """Robust utility to reset Postgres sequences when IDs get out of sync."""
+    db_uri = current_app.config.get('SQLALCHEMY_DATABASE_URI', '')
+    if 'postgresql' not in db_uri:
+        flash('Sequence reset is only required for PostgreSQL (Vercel).', 'info')
         return redirect(url_for('admin.dashboard'))
         
     try:
-        # Reset sequences for all tables
+        # Table list in order of potential dependency or just common tables
         tables = ['user', 'event', 'seat', 'booking', 'ticket', 'coupon']
+        results = []
+        
         for table in tables:
-            db.session.execute(db.text(f"SELECT setval(pg_get_serial_sequence('\"{table}\"', 'id'), coalesce(max(id), 1), max(id) IS NOT null) FROM \"{table}\";"))
+            # PostgreSQL specific query to sync sequences
+            # We use "table" to avoid issues with reserved words like 'user'
+            query = f"""
+                SELECT setval(
+                    pg_get_serial_sequence('"{table}"', 'id'), 
+                    coalesce(max(id), 1), 
+                    max(id) IS NOT null
+                ) FROM "{table}";
+            """
+            db.session.execute(db.text(query))
+            results.append(table)
+            
         db.session.commit()
-        flash('Database sequences synchronized successfully!', 'success')
+        flash(f'Successfully synchronized sequences for: {", ".join(results)}', 'success')
     except Exception as e:
         db.session.rollback()
-        flash(f'Error resetting sequences: {str(e)}', 'error')
+        flash(f'Database Sync Error: {str(e)}', 'error')
+        print(f"CRITICAL: Failed to reset sequences: {e}")
         
     return redirect(url_for('admin.dashboard'))
 
