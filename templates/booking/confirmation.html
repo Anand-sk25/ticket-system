@@ -1,5 +1,9 @@
 {% extends "base.html" %}
 
+{% block head %}
+<!-- Ticket Confirmation exact print styling handled natively via CSS in style.css -->
+{% endblock %}
+
 {% block title %}Ticket Confirmation{% endblock %}
 
 {% block content %}
@@ -18,68 +22,85 @@
     {% if booking.status == 'confirmed' %}
     <div class="ticket-container">
         {% for ticket in booking.tickets %}
-        <div class="ticket" {% if booking.event.ticket_image_filename %}
-            style="background-image: url('{{ url_for('main.uploaded_file', filename=booking.event.ticket_image_filename) }}');"
-            {% endif %}>
-            <!-- Left Stub -->
-            <div class="ticket-stub">
-                <div class="stub-vertical-text">ADMIT ONE</div>
-                <div class="stub-info">
-                    <p class="seat-number-text" style="font-weight: bold; font-size: 1rem; margin-top: 1rem;">{{
-                        ticket.seat_number }}</p>
-                    <p style="opacity: 0.7; font-size: 0.6rem;">{{ ticket.unique_code }}</p>
-                </div>
-            </div>
-
-            <!-- Main Section -->
-            <div class="ticket-main">
-                <div class="ticket-main-overlay"></div>
-                <div class="ticket-content">
-                    <div>
-                        <p class="ticket-event-tag">{{ booking.event.organized_by or 'MGM Events' }} PRESENTS</p>
-                        <h2 class="ticket-event-title">{{ booking.event.title }}</h2>
-                    </div>
-
-                    <div class="ticket-details-grid">
-                        <div class="detail-item">
-                            <label>Date</label>
-                            <span>{{ booking.event.date_time.strftime('%b %d, %Y') }}</span>
-                        </div>
-                        <div class="detail-item">
-                            <label>Time</label>
-                            <span>{{ booking.event.date_time.strftime('%I:%M %p') }}</span>
-                        </div>
-                        <div class="detail-item">
-                            <label>Venue</label>
-                            <span>{{ booking.event.venue }}</span>
-                        </div>
-                        <div class="detail-item">
-                            <label>Attendee</label>
-                            <span>{{ booking.user.username }}</span>
-                        </div>
-                        <div class="detail-item">
-                            <label>Seat</label>
-                            <span class="seat-number-text">{{ ticket.seat_number }}</span>
-                        </div>
+        <div
+            style="display: flex; flex-direction: column; align-items: center; gap: 1rem; width: 100%; margin-bottom: 2rem;">
+            <div class="ticket" id="ticket-{{ ticket.unique_code }}" {% if booking.event.ticket_image_url %}
+                style="background-image: url('{{ booking.event.ticket_image_url }}');" {% elif
+                booking.event.ticket_image_filename %}
+                style="background-image: url('{{ url_for('main.uploaded_file', filename=booking.event.ticket_image_filename) }}');"
+                {% endif %}>
+                <!-- Left Stub -->
+                <div class="ticket-stub">
+                    <div class="stub-vertical-text">ADMIT ONE</div>
+                    <div class="stub-info">
+                        <p class="seat-number-text" style="font-weight: bold; font-size: 1rem; margin-top: 1rem;">{{
+                            ticket.seat_number }}</p>
+                        <p style="opacity: 0.7; font-size: 0.6rem;">{{ ticket.unique_code }}</p>
                     </div>
                 </div>
 
-                <!-- QR Code Section -->
-                <div class="ticket-qr-section">
-                    <div class="ticket-qr-image">
-                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ url_for('booking.verify_ticket', code=ticket.unique_code, _external=True) }}"
-                            alt="QR" style="width: 100%; height: auto; display: block;">
+                <!-- Main Section -->
+                <div class="ticket-main">
+                    <div class="ticket-main-overlay"></div>
+                    <div class="ticket-content">
+                        <div>
+                            <p class="ticket-event-tag">{{ booking.event.organized_by or 'MGM Events' }} PRESENTS</p>
+                            <h2 class="ticket-event-title">{{ booking.event.title }}</h2>
+                        </div>
+
+                        <div class="ticket-details-grid">
+                            <div class="detail-item">
+                                <label>Date</label>
+                                <span>{{ booking.event.date_time.strftime('%b %d, %Y') }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <label>Time</label>
+                                <span>{{ booking.event.date_time.strftime('%I:%M %p') }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <label>Venue</label>
+                                <span>{{ booking.event.venue }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <label>Attendee</label>
+                                <span>{{ booking.user.username }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <label>Seat</label>
+                                <span class="seat-number-text">{{ ticket.seat_number }}</span>
+                            </div>
+                        </div>
                     </div>
-                    <p class="booking-id">ID: {{ ticket.unique_code }}</p>
+
+                    <!-- QR Code Section -->
+                    <div class="ticket-qr-section">
+                        <div class="ticket-qr-image">
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ url_for('booking.verify_ticket', code=ticket.unique_code, _external=True) }}"
+                                alt="QR" style="width: 100%; height: auto; display: block;">
+                        </div>
+                        <p class="booking-id">ID: {{ ticket.unique_code }}</p>
+                    </div>
                 </div>
-            </div>
-        </div>
+            </div> <!-- End of .ticket -->
+
+            <button onclick="window.print()" class="btn-primary"
+                style="display: flex; align-items: center; gap: 0.5rem; background: linear-gradient(135deg, rgba(0, 255, 100, 0.9), rgba(0, 100, 255, 0.9)); margin-top: 1rem;">
+                <i class="fas fa-print"></i> Print / Save PDF
+            </button>
+        </div> <!-- End of wrapper -->
         {% endfor %}
     </div>
 
-    <button onclick="window.print()" class="btn-secondary"
-        style="margin-top: 3rem; background: white; color: #333;">Print Tickets</button>
+    <div style="display: flex; justify-content: center; gap: 1rem; margin-top: 3rem;">
+        <a href="{{ url_for('main.index') }}" class="btn-secondary" style="background: white; color: #333;">Back to
+            Home</a>
+    </div>
+
+    <!-- No extra JS needed for print -->
     {% endif %}
+
+    {% if booking.status != 'confirmed' %}
     <a href="{{ url_for('main.index') }}" class="btn-primary" style="margin-top: 3rem;">Back to Home</a>
+    {% endif %}
 </div>
 {% endblock %}

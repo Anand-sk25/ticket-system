@@ -21,9 +21,11 @@ class Event(db.Model):
     venue = db.Column(db.String(200), nullable=False)
     price = db.Column(db.Float, nullable=False)
     image_filename = db.Column(db.String(200), nullable=True)
+    image_url = db.Column(db.String(500), nullable=True)
     organized_by = db.Column(db.String(100), nullable=True)
     total_seats = db.Column(db.Integer, default=100)
     ticket_image_filename = db.Column(db.String(200), nullable=True)
+    ticket_image_url = db.Column(db.String(500), nullable=True)
     # We will manage seats dynamically or via Seat model if specific seat locking is required
     seats = db.relationship('Seat', backref='event', lazy=True, cascade='all, delete-orphan')
     coupons = db.relationship('Coupon', backref='event', lazy=True, cascade='all, delete-orphan')
@@ -54,7 +56,10 @@ class Ticket(db.Model):
     unique_code = db.Column(db.String(100), unique=True, nullable=False)
     is_scanned = db.Column(db.Boolean, default=False)
     scanned_at = db.Column(db.DateTime, nullable=True)
+    scanned_by_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     generated_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    scanned_by = db.relationship('User', foreign_keys=[scanned_by_id], backref='scanned_tickets', lazy=True)
 
 class Coupon(db.Model):
     id = db.Column(db.Integer, primary_key=True)

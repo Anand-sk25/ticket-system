@@ -19,7 +19,10 @@
     <div class="card event-card">
         <div class="event-image"
             style="height: 200px; background-color: rgba(255,255,255,0.1); border-radius: 8px; margin-bottom: 1rem; overflow: hidden;">
-            {% if event.image_filename %}
+            {% if event.image_url %}
+            <img src="{{ event.image_url }}" alt="{{ event.title }}"
+                style="width: 100%; height: 100%; object-fit: cover;">
+            {% elif event.image_filename %}
             <img src="{{ url_for('main.uploaded_file', filename=event.image_filename) }}" alt="{{ event.title }}"
                 style="width: 100%; height: 100%; object-fit: cover;">
             {% else %}

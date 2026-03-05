@@ -117,14 +117,19 @@ def verify_ticket(code):
     if not ticket.is_scanned:
         ticket.is_scanned = True
         ticket.scanned_at = now
+        ticket.scanned_by_id = current_user.id
         db.session.commit()
         first_scan = True
     else:
-        # Grace period: If scanned within the last 10 seconds, treat it as a "new" successful scan
-        # This handles double-clicks, multiple rapid QR reads, and browser pre-fetches/auto-refreshes
-        time_since_scan = (now - ticket.scanned_at).total_seconds()
-        if time_since_scan <= 10:
+        # Check if the SAME admin is scanning again
+        if ticket.scanned_by_id == current_user.id:
+            # User wants: "if the same admin... not say to verify again"
+            # This means we treat it like a "success/first scan" result to suppress the warning
             first_scan = True
+        else:
+            # Grace period logic removed as we now track precisely who scanned it
+            # Different admin or much later scan by someone else (though only admins can scan)
+            first_scan = False
     
     return render_template('booking/verify_result.html', 
                            valid=True, 

@@ -649,39 +649,23 @@ input:focus {
 }
 
 @media print {
+    @page {
+        margin: 0.5cm;
+    }
+
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color-adjust: exact !important;
+    }
+
     body {
-        background: white;
-        color: black;
+        margin: 0;
+        padding: 0;
+        background-color: var(--bg-color) !important;
     }
 
-    .ticket {
-        box-shadow: none;
-        border: 1px solid #ddd;
-        page-break-inside: avoid;
-        margin-bottom: 50px;
-    }
-
-    .ticket-main-overlay {
-        background: rgba(255, 255, 255, 0.9);
-    }
-
-    .ticket-event-title {
-        -webkit-text-fill-color: black;
-    }
-
-    .detail-item span {
-        color: black;
-    }
-
-    .btn-primary,
-    .btn-secondary,
-    nav,
-    footer {
-        display: none !important;
-    }
-}
-
-@media print {
+    /* Hide everything except the ticket container */
     body * {
         visibility: hidden;
     }
@@ -693,24 +677,82 @@ input:focus {
 
     .ticket {
         position: absolute;
-        left: 0;
-        top: 0;
-        margin: 0;
-        box-shadow: none;
-        border: 1px solid #ccc;
+        left: 5%;
+        top: 2rem;
+        width: 90% !important;
+        max-width: 700px;
+        box-shadow: none !important;
+        break-inside: avoid;
         page-break-inside: avoid;
+        margin: 0 !important;
+        transform: none !important;
     }
 
-    .container {
-        width: 100%;
-        margin: 0;
-        padding: 0;
+    /* Hide the main right-side overlay so the shade is only on the left side stub */
+    .ticket-main-overlay {
+        display: none !important;
     }
 
-    .btn-primary,
-    .btn-secondary,
-    nav,
-    footer {
+    /* Flawless background shading via absolute pseudo-element mapping */
+    .ticket::before {
+        content: '' !important;
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+        bottom: 0 !important;
+        right: 0 !important;
+        /* Left 30% is solid deep blue, right 70% is a lighter semi-transparent shade */
+        background: linear-gradient(to right, rgba(10, 15, 25, 0.95) 0%, rgba(10, 15, 25, 0.95) 30%, rgba(10, 15, 25, 0.4) 30%, rgba(10, 15, 25, 0.2) 100%) !important;
+        z-index: 1 !important;
+        border-radius: 20px !important;
+    }
+
+    /* Force the text and QR code to render on top of the overlay */
+    .ticket-content {
+        position: relative !important;
+        z-index: 10 !important;
+    }
+
+    /* Keep text on top, background handled by ::before */
+    .ticket-stub {
+        position: relative !important;
+        z-index: 10 !important;
+        background: transparent !important;
+    }
+
+    .ticket-qr-section {
+        position: absolute !important;
+        z-index: 10 !important;
+    }
+
+    /* Explicitly force white text because browsers invert it */
+    .ticket-event-tag,
+    .detail-item label,
+    .booking-id,
+    .stub-info {
+        color: white !important;
+        opacity: 0.9 !important;
+    }
+
+    .detail-item span,
+    .seat-number-text {
+        color: white !important;
+    }
+
+    /* Explicitly force colored text */
+    .ticket-event-title,
+    .stub-vertical-text {
+        color: var(--primary-color) !important;
+        -webkit-text-fill-color: var(--primary-color) !important;
+    }
+
+    .navbar,
+    footer,
+    button,
+    a.btn-primary,
+    a.btn-secondary,
+    header,
+    h1 {
         display: none !important;
     }
 }

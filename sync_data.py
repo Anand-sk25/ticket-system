@@ -89,9 +89,16 @@ def migrate():
         for e in events:
             new_e = Event(id=e['id'], title=e['title'], description=e['description'], 
                           date_time=e['date_time'], venue=e['venue'], price=e['price'], 
-                          image_filename=e['image_filename'], organized_by=e['organized_by'], 
-                          total_seats=e['total_seats'])
+                          image_filename=e['image_filename'], 
+                          image_url=e['image_url'],
+                          organized_by=e['organized_by'], 
+                          total_seats=e['total_seats'],
+                          ticket_image_filename=e['ticket_image_filename'],
+                          ticket_image_url=e['ticket_image_url'])
             live_session.merge(new_e)
+        
+        print("\n[IMPORTANT] Reminder: Actual image files in 'static/uploads' are NOT synced by this script.")
+        print("For Vercel, it is highly recommended to use the 'External Image URL' fields in the Admin Dashboard.")
 
         # 4. Sync Seats
         print("Syncing Seats...")

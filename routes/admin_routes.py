@@ -104,7 +104,9 @@ def new_event():
             total_seats=total_seats,
 
             image_filename=image_filename,
+            image_url=request.form.get('image_url'),
             ticket_image_filename=None,
+            ticket_image_url=request.form.get('ticket_image_url'),
             organized_by=request.form.get('organized_by')
         )
 
@@ -213,12 +215,10 @@ def edit_event(event_id):
                 file.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
                 event.image_filename = filename
                 
-        if 'ticket_image' in request.files:
-            ticket_file = request.files['ticket_image']
-            if ticket_file and ticket_file.filename != '':
-                ticket_filename = "ticket_" + secure_filename(ticket_file.filename)
-                ticket_file.save(os.path.join(current_app.config['UPLOAD_FOLDER'], ticket_filename))
                 event.ticket_image_filename = ticket_filename
+                
+        event.image_url = request.form.get('image_url')
+        event.ticket_image_url = request.form.get('ticket_image_url')
                 
         db.session.commit()
         flash('Event updated successfully!', 'success')
