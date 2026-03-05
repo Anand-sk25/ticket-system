@@ -106,11 +106,20 @@ def verify_ticket(code):
     user = booking.user
     
     first_scan = False
+    now = datetime.utcnow()
+    
+    # If not scanned yet, mark as scanned
     if not ticket.is_scanned:
         ticket.is_scanned = True
-        ticket.scanned_at = datetime.utcnow()
+        ticket.scanned_at = now
         db.session.commit()
         first_scan = True
+    else:
+        # Grace period: If scanned within the last 10 seconds, treat it as a "new" successful scan
+        # This handles double-clicks, multiple rapid QR reads, and browser pre-fetches/auto-refreshes
+        time_since_scan = (now - ticket.scanned_at).total_seconds()
+        if time_since_scan <= 10:
+            first_scan = True
     
     return render_template('booking/verify_result.html', 
                            valid=True, 

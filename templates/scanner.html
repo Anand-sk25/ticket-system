@@ -19,12 +19,16 @@
 
 <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 <script>
+    let scanningActive = true;
     function onScanSuccess(decodedText, decodedResult) {
+        if (!scanningActive) return;
+
         // Handle the scanned code as you like, for example:
         console.log(`Code matched = ${decodedText}`, decodedResult);
 
-        // Stop scanning
-        // html5QrcodeScanner.clear();
+        // Stop scanning to prevent multiple hits
+        scanningActive = false;
+        html5QrcodeScanner.clear();
 
         // Show loading or redirect
         window.location.href = decodedText;
