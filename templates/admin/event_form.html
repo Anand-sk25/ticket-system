@@ -49,8 +49,9 @@
         </div>
 
         <div class="form-group">
-            <label for="image">Event Image</label>
-            <input type="file" id="image" name="image" accept="image/*" onchange="previewImage(this)">
+            <label for="image">Event Card Image (Home Page)</label>
+            <input type="file" id="image" name="image" accept="image/*"
+                onchange="previewImage(this, 'image-preview', 'new-preview-container')">
             {% if event and event.image_filename %}
             <div style="margin-top: 1rem;">
                 <p style="margin-bottom: 0.5rem; font-size: 0.9rem; opacity: 0.7;">Current Image:</p>
@@ -66,10 +67,30 @@
             {% endif %}
         </div>
 
+        <div class="form-group">
+            <label for="ticket_image">Ticket Background Image (Custom Redesign)</label>
+            <input type="file" id="ticket_image" name="ticket_image" accept="image/*"
+                onchange="previewImage(this, 'ticket-preview', 'ticket-preview-container')">
+            {% if event and event.ticket_image_filename %}
+            <div style="margin-top: 1rem;">
+                <p style="margin-bottom: 0.5rem; font-size: 0.9rem; opacity: 0.7;">Current Ticket Image:</p>
+                <img id="ticket-preview" src="{{ url_for('main.uploaded_file', filename=event.ticket_image_filename) }}"
+                    alt="Ticket Preview"
+                    style="max-width: 200px; border-radius: 8px; border: 1px solid var(--glass-border);">
+            </div>
+            {% else %}
+            <div id="ticket-preview-container" style="margin-top: 1rem; display: none;">
+                <p style="margin-bottom: 0.5rem; font-size: 0.9rem; opacity: 0.7;">New Ticket Image Preview:</p>
+                <img id="ticket-preview" src="#" alt="Ticket Preview"
+                    style="max-width: 200px; border-radius: 8px; border: 1px solid var(--glass-border);">
+            </div>
+            {% endif %}
+        </div>
+
         <script>
-            function previewImage(input) {
-                const preview = document.getElementById('image-preview');
-                const container = document.getElementById('new-preview-container');
+            function previewImage(input, previewId, containerId) {
+                const preview = document.getElementById(previewId);
+                const container = document.getElementById(containerId);
                 if (input.files && input.files[0]) {
                     const reader = new FileReader();
                     reader.onload = function (e) {

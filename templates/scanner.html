@@ -1,49 +1,72 @@
 {% extends "base.html" %}
 
-{% block title %}QR Scanner{% endblock %}
+{% block title %}QR Scanner App{% endblock %}
 
 {% block content %}
-<div class="container" style="text-align: center; max-width: 600px; margin: 0 auto;">
-    <h1>Event Ticket Scanner</h1>
-    <p style="opacity: 0.8; margin-bottom: 2rem;">Scan the QR code on the ticket to verify entry.</p>
+<div class="scanner-container">
+    <div style="text-align: center; margin-bottom: 3rem;">
+        <h1 class="ticket-event-tag" style="font-size: 1rem;">MGM Premium Scanner</h1>
+        <h2 style="font-size: 2.5rem; font-weight: 800; letter-spacing: -1px; margin-top: -0.5rem;">Ready to <span
+                style="color: var(--primary-color);">Verify</span></h2>
+        <p style="opacity: 0.7;">Align QR code within the frame to scan automatically.</p>
+    </div>
 
-    <div id="reader"
-        style="width: 100%; border-radius: 16px; overflow: hidden; border: 2px solid var(--primary-color);"></div>
+    <div style="position: relative;">
+        <div id="reader"></div>
+        <div class="scan-line"></div>
+    </div>
 
-    <div id="result" style="margin-top: 2rem; display: none;">
-        <div class="card" id="result-card">
-            <!-- Result will be populated here -->
-        </div>
+    <div style="margin-top: 3rem; text-align: center; font-size: 0.9rem; opacity: 0.6;">
+        <p><i class="fas fa-shield-alt"></i> Secure Admin Verification Active</p>
     </div>
 </div>
 
 <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 <script>
     let scanningActive = true;
-    function onScanSuccess(decodedText, decodedResult) {
+
+    function onScanSuccess(decodedText) {
         if (!scanningActive) return;
 
-        // Handle the scanned code as you like, for example:
-        console.log(`Code matched = ${decodedText}`, decodedResult);
-
-        // Stop scanning to prevent multiple hits
+        console.log("Scan Success:", decodedText);
         scanningActive = false;
-        html5QrcodeScanner.clear();
 
-        // Show loading or redirect
-        window.location.href = decodedText;
+        // Add a visual 'hit' effect
+        const reader = document.getElementById('reader');
+        reader.style.boxShadow = '0 0 50px var(--secondary-color)';
+        reader.style.borderColor = 'var(--secondary-color)';
+
+        // Short delay for feedback before redirect
+        setTimeout(() => {
+            window.location.href = decodedText;
+        }, 600);
     }
 
     function onScanFailure(error) {
-        // handle scan failure, usually better to ignore and keep scanning.
-        // for example:
-        // console.warn(`Code scan error = ${error}`);
+        // We usually ignore failure to keep the loop going
+        // But we can log start/end of session issues
     }
 
-    let html5QrcodeScanner = new Html5QrcodeScanner(
-        "reader",
-        { fps: 10, qrbox: { width: 250, height: 250 } },
-        /* verbose= */ false);
-    html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+    // Wait for the library to be ready
+    window.addEventListener('load', () => {
+        try {
+            const html5QrcodeScanner = new Html5QrcodeScanner(
+                "reader",
+                {
+                    fps: 15,
+                    qrbox: { width: 250, height: 250 },
+                    aspectRatio: 1.0,
+                    rememberLastUsedCamera: true,
+                    supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA]
+                },
+                false);
+
+            html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+        } catch (err) {
+            console.error("Scanner Initialization Error:", err);
+            document.querySelector('.scanner-container p').innerHTML =
+                '<span style="color: var(--primary-color);">Camera Error: Please ensure you have granted camera permissions.</span>';
+        }
+    });
 </script>
 {% endblock %}

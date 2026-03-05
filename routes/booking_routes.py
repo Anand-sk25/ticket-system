@@ -96,7 +96,12 @@ def my_bookings():
     return render_template('booking/my_bookings.html', bookings=bookings)
 
 @booking_bp.route('/verify/<code>')
+@login_required
 def verify_ticket(code):
+    if not current_user.is_admin:
+        flash('Access denied. Only authorized staff can verify tickets.', 'error')
+        return redirect(url_for('main.index'))
+        
     ticket = Ticket.query.filter_by(unique_code=code).first()
     if not ticket:
         return render_template('booking/verify_result.html', valid=False, message="Invalid Ticket Code")

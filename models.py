@@ -23,6 +23,7 @@ class Event(db.Model):
     image_filename = db.Column(db.String(200), nullable=True)
     organized_by = db.Column(db.String(100), nullable=True)
     total_seats = db.Column(db.Integer, default=100)
+    ticket_image_filename = db.Column(db.String(200), nullable=True)
     # We will manage seats dynamically or via Seat model if specific seat locking is required
     seats = db.relationship('Seat', backref='event', lazy=True, cascade='all, delete-orphan')
     coupons = db.relationship('Coupon', backref='event', lazy=True, cascade='all, delete-orphan')

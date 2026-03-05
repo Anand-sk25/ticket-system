@@ -104,8 +104,17 @@ def new_event():
             total_seats=total_seats,
 
             image_filename=image_filename,
+            ticket_image_filename=None,
             organized_by=request.form.get('organized_by')
         )
+
+        if 'ticket_image' in request.files:
+            ticket_file = request.files['ticket_image']
+            if ticket_file and ticket_file.filename != '':
+                ticket_filename = "ticket_" + secure_filename(ticket_file.filename)
+                ticket_file.save(os.path.join(current_app.config['UPLOAD_FOLDER'], ticket_filename))
+                new_event.ticket_image_filename = ticket_filename
+
         db.session.add(new_event)
         db.session.commit()
 
@@ -204,6 +213,13 @@ def edit_event(event_id):
                 file.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
                 event.image_filename = filename
                 
+        if 'ticket_image' in request.files:
+            ticket_file = request.files['ticket_image']
+            if ticket_file and ticket_file.filename != '':
+                ticket_filename = "ticket_" + secure_filename(ticket_file.filename)
+                ticket_file.save(os.path.join(current_app.config['UPLOAD_FOLDER'], ticket_filename))
+                event.ticket_image_filename = ticket_filename
+                
         db.session.commit()
         flash('Event updated successfully!', 'success')
         return redirect(url_for('admin.dashboard'))
@@ -268,3 +284,25 @@ def delete_event(event_id):
     flash('Event deleted.', 'success')
     return redirect(url_for('admin.dashboard'))
 
+@admin_bp.route('/users')
+@login_required
+@admin_required
+def manage_users():
+    users = User.query.all()
+    return render_template('admin/manage_users.html', users=users)
+
+@admin_bp.route('/users/toggle_admin/<int:user_id>', methods=['POST'])
+@login_required
+@admin_required
+def toggle_admin(user_id):
+    if current_user.id == user_id:
+        flash('You cannot change your own admin status.', 'error')
+        return redirect(url_for('admin.manage_users'))
+        
+    user = User.query.get_or_404(user_id)
+    user.is_admin = not user.is_admin
+    db.session.commit()
+    
+    status = "promoted to Admin" if user.is_admin else "demoted to User"
+    flash(f'User {user.username} has been {status}.', 'success')
+    return redirect(url_for('admin.manage_users'))

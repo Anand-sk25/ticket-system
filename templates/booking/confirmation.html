@@ -18,60 +18,59 @@
     {% if booking.status == 'confirmed' %}
     <div class="ticket-container">
         {% for ticket in booking.tickets %}
-        <div class="ticket">
-            <div class="ticket-header">
-                <h3>MGM Events</h3>
-                <p>Ticket ID: {{ ticket.unique_code }}</p>
+        <div class="ticket" {% if booking.event.ticket_image_filename %}
+            style="background-image: url('{{ url_for('main.uploaded_file', filename=booking.event.ticket_image_filename) }}');"
+            {% endif %}>
+            <!-- Left Stub -->
+            <div class="ticket-stub">
+                <div class="stub-vertical-text">ADMIT ONE</div>
+                <div class="stub-info">
+                    <p class="seat-number-text" style="font-weight: bold; font-size: 1rem; margin-top: 1rem;">{{
+                        ticket.seat_number }}</p>
+                    <p style="opacity: 0.7; font-size: 0.6rem;">{{ ticket.unique_code }}</p>
+                </div>
             </div>
 
-            <div class="ticket-body">
-                <h2 style="color: var(--primary-color); margin-bottom: 1rem; font-size: 1.4rem;">{{ booking.event.title
-                    }}</h2>
-
-                <div class="ticket-info-grid">
-                    <div class="ticket-info-item">
-                        <p>Date</p>
-                        <p>{{ booking.event.date_time.strftime('%b %d, %Y') }}</p>
+            <!-- Main Section -->
+            <div class="ticket-main">
+                <div class="ticket-main-overlay"></div>
+                <div class="ticket-content">
+                    <div>
+                        <p class="ticket-event-tag">{{ booking.event.organized_by or 'MGM Events' }} PRESENTS</p>
+                        <h2 class="ticket-event-title">{{ booking.event.title }}</h2>
                     </div>
-                    <div class="ticket-info-item">
-                        <p>Time</p>
-                        <p>{{ booking.event.date_time.strftime('%I:%M %p') }}</p>
-                    </div>
-                </div>
 
-                <div class="ticket-info-item" style="margin-bottom: 1rem;">
-                    <p>Venue</p>
-                    <p>{{ booking.event.venue }}</p>
-                </div>
-
-                <div class="ticket-info-item">
-                    <p>Organized By</p>
-                    <p>{{ booking.event.organized_by or 'MGM Events' }}</p>
-                </div>
-
-                <div class="ticket-divider"></div>
-
-                <div class="ticket-footer">
-                    <div style="width: 100%; text-align: center;">
-                        <div style="margin-bottom: 0.8rem;">
-                            <p
-                                style="font-size: 0.7rem; color: #666; margin-bottom: 0.2rem; text-transform: uppercase;">
-                                Attendee</p>
-                            <p style="font-weight: bold; font-size: 1.1rem; color: #1e293b;">{{ booking.user.username }}
-                            </p>
+                    <div class="ticket-details-grid">
+                        <div class="detail-item">
+                            <label>Date</label>
+                            <span>{{ booking.event.date_time.strftime('%b %d, %Y') }}</span>
                         </div>
-                        <div>
-                            <p
-                                style="font-size: 0.7rem; color: #666; margin-bottom: 0.2rem; text-transform: uppercase;">
-                                Seat</p>
-                            <p style="font-weight: bold; color: var(--primary-color); font-size: 1.4rem;">{{
-                                ticket.seat_number }}</p>
+                        <div class="detail-item">
+                            <label>Time</label>
+                            <span>{{ booking.event.date_time.strftime('%I:%M %p') }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Venue</label>
+                            <span>{{ booking.event.venue }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Attendee</label>
+                            <span>{{ booking.user.username }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Seat</label>
+                            <span class="seat-number-text">{{ ticket.seat_number }}</span>
                         </div>
                     </div>
-                    <div class="qr-code-wrapper">
+                </div>
+
+                <!-- QR Code Section -->
+                <div class="ticket-qr-section">
+                    <div class="ticket-qr-image">
                         <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ url_for('booking.verify_ticket', code=ticket.unique_code, _external=True) }}"
-                            alt="QR">
+                            alt="QR" style="width: 100%; height: auto; display: block;">
                     </div>
+                    <p class="booking-id">ID: {{ ticket.unique_code }}</p>
                 </div>
             </div>
         </div>

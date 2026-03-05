@@ -5,49 +5,61 @@
 {% block content %}
 <div class="container" style="text-align: center; max-width: 500px; margin: 4rem auto;">
     {% if valid %}
-    <div class="card" style="border: 2px solid #86efac; box-shadow: 0 0 20px rgba(134, 239, 172, 0.2);">
-        <div
-            style="background: rgba(134, 239, 172, 0.2); width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
-            <i class="fas fa-check fa-3x" style="color: #4ade80;"></i>
+    <div class="card verify-card success">
+        <div class="verify-icon-box"
+            style="background: rgba(0, 255, 100, 0.12); border: 2px solid var(--secondary-color); box-shadow: 0 0 20px rgba(0, 255, 100, 0.3);">
+            <i class="fas fa-check fa-3x"
+                style="color: var(--secondary-color); text-shadow: 0 0 10px var(--secondary-color);"></i>
         </div>
-        <h2 style="color: #4ade80;">Valid Ticket</h2>
+
+        <h2 style="color: var(--secondary-color); font-weight: 800; text-transform: uppercase; letter-spacing: 2px;">
+            Valid Ticket</h2>
 
         {% if not first_scan %}
         <div
-            style="background: rgba(251, 191, 36, 0.2); color: #fbbf24; padding: 0.5rem; border-radius: 4px; display: inline-block; margin-top: 0.5rem; font-weight: bold; border: 1px solid #fbbf24;">
+            style="background: rgba(255, 0, 50, 0.1); color: var(--primary-color); padding: 0.6rem 1.2rem; border-radius: 8px; display: inline-block; margin-top: 1rem; font-weight: 700; border: 1px solid var(--primary-color); font-size: 0.8rem; box-shadow: 0 0 15px rgba(255, 0, 50, 0.2);">
             <i class="fas fa-exclamation-triangle"></i> ALREADY SCANNED ONCE
         </div>
-        <p style="color: #fbbf24; font-size: 0.9rem; margin-top: 0.5rem;">
-            This ticket was already used on {{ ticket.scanned_at.strftime('%b %d at %I:%M %p') }}
+        <p style="color: var(--primary-color); font-size: 0.8rem; margin-top: 0.5rem; opacity: 0.8;">
+            Used on {{ ticket.scanned_at.strftime('%b %d at %I:%M %p') }}
         </p>
         {% endif %}
 
-        <hr style="border: 0; border-top: 1px solid var(--glass-border); margin: 1.5rem 0;">
+        <hr style="border: 0; border-top: 1px solid var(--glass-border); margin: 2rem 0;">
 
-        <h3 style="margin-bottom: 0.5rem;">{{ event.title }}</h3>
-        <p style="opacity: 0.7;">{{ event.date_time.strftime('%b %d, %Y - %I:%M %p') }}</p>
+        <h3 style="margin-bottom: 0.5rem; font-weight: 700; color: white;">{{ event.title }}</h3>
+        <p style="opacity: 0.6; font-size: 0.9rem;">{{ event.date_time.strftime('%b %d, %Y - %I:%M %p') }}</p>
 
         <div
-            style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 8px; margin-top: 1.5rem; text-align: left;">
-            <p><strong>Attendee:</strong> {{ user.username }}</p>
-            <p><strong>Seat:</strong> {{ seat or 'General' }}</p>
-            <p><strong>Ticket ID:</strong> {{ ticket.unique_code }}</p>
+            style="background: rgba(255,255,255,0.03); padding: 1.5rem; border-radius: 12px; margin-top: 2rem; text-align: left; border: 1px solid var(--glass-border);">
+            <p style="margin-bottom: 0.5rem;"><strong
+                    style="color: rgba(255,255,255,0.5); font-size: 0.7rem; text-transform: uppercase;">Attendee</strong><br>{{
+                user.username }}</p>
+            <p style="margin-bottom: 0.5rem;"><strong
+                    style="color: rgba(255,255,255,0.5); font-size: 0.7rem; text-transform: uppercase;">Seat</strong><br>{{
+                seat or 'General' }}</p>
+            <p><strong style="color: rgba(255,255,255,0.5); font-size: 0.7rem; text-transform: uppercase;">Ticket
+                    ID</strong><br><span style="font-family: monospace; opacity: 0.8;">{{ ticket.unique_code }}</span>
+            </p>
         </div>
 
-        <a href="{{ url_for('booking.scanner') }}" class="btn-primary" style="display: block; margin-top: 1.5rem;">Scan
-            Next</a>
+        <a href="{{ url_for('booking.scanner') }}" class="btn-primary"
+            style="display: block; margin-top: 2rem; text-decoration: none;">Scan Next</a>
     </div>
     {% else %}
-    <div class="card" style="border: 2px solid #fca5a5; box-shadow: 0 0 20px rgba(252, 165, 165, 0.2);">
-        <div
-            style="background: rgba(252, 165, 165, 0.2); width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
-            <i class="fas fa-times fa-3x" style="color: #f87171;"></i>
+    <div class="card verify-card error">
+        <div class="verify-icon-box"
+            style="background: rgba(255, 0, 50, 0.12); border: 2px solid var(--primary-color); box-shadow: 0 0 20px rgba(255, 0, 50, 0.3);">
+            <i class="fas fa-times fa-3x"
+                style="color: var(--primary-color); text-shadow: 0 0 10px var(--primary-color);"></i>
         </div>
-        <h2 style="color: #f87171;">Invalid Ticket</h2>
-        <p>{{ message }}</p>
 
-        <a href="{{ url_for('booking.scanner') }}" class="btn-primary" style="display: block; margin-top: 1.5rem;">Scan
-            Next</a>
+        <h2 style="color: var(--primary-color); font-weight: 800; text-transform: uppercase; letter-spacing: 2px;">
+            Invalid Ticket</h2>
+        <p style="margin-top: 1rem; opacity: 0.8;">{{ message }}</p>
+
+        <a href="{{ url_for('booking.scanner') }}" class="btn-primary"
+            style="display: block; margin-top: 2rem; text-decoration: none;">Try Again</a>
     </div>
     {% endif %}
 </div>

@@ -7,6 +7,9 @@
     style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
     <h1>Admin Dashboard</h1>
     <div style="display: flex; gap: 1rem;">
+        <a href="{{ url_for('admin.manage_users') }}" class="btn-secondary" style="border-color: var(--accent-color);">
+            <i class="fas fa-users"></i> Users
+        </a>
         <a href="{{ url_for('admin.reset_sequences') }}" class="btn-secondary"
             style="background: rgba(251, 191, 36, 0.1); border: 1px solid #fbbf24; color: #fbbf24;">
             <i class="fas fa-sync-alt"></i> Fix Database Sync

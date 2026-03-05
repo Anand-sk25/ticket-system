@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Users{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div style="text-align: center; margin-bottom: 3rem;">
+        <h1 class="ticket-event-tag" style="font-size: 1rem;">Administrative Panel</h1>
+        <h2 style="font-size: 2.5rem; font-weight: 800; letter-spacing: -1px; margin-top: -0.5rem;">User <span
+                style="color: var(--primary-color);">Management</span></h2>
+        <p style="opacity: 0.7;">Promote or demote users to manage site administration.</p>
+    </div>
+
+    <div class="card" style="padding: 0; overflow: hidden; border: 1px solid var(--glass-border);">
+        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <thead style="background: rgba(255, 255, 255, 0.05); border-bottom: 1px solid var(--glass-border);">
+                <tr>
+                    <th
+                        style="padding: 1.5rem; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.6);">
+                        Username</th>
+                    <th
+                        style="padding: 1.5rem; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.6);">
+                        Email</th>
+                    <th
+                        style="padding: 1.5rem; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.6);">
+                        Role</th>
+                    <th
+                        style="padding: 1.5rem; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.6); text-align: right;">
+                        Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05); transition: background 0.3s;"
+                    onmouseover="this.style.background='rgba(255,255,255,0.02)'"
+                    onmouseout="this.style.background='transparent'">
+                    <td style="padding: 1.2rem 1.5rem; font-weight: 600;">{{ user.username }}</td>
+                    <td style="padding: 1.2rem 1.5rem; opacity: 0.7;">{{ user.email }}</td>
+                    <td style="padding: 1.2rem 1.5rem;">
+                        {% if user.is_admin %}
+                        <span
+                            style="background: rgba(0, 255, 100, 0.1); color: var(--secondary-color); padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.75rem; font-weight: 700; border: 1px solid rgba(0, 255, 100, 0.2);">Admin</span>
+                        {% else %}
+                        <span
+                            style="background: rgba(255, 255, 255, 0.05); color: white; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; border: 1px solid rgba(255, 255, 255, 0.1);">User</span>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 1.2rem 1.5rem; text-align: right;">
+                        {% if user.id != current_user.id %}
+                        <form action="{{ url_for('admin.toggle_admin', user_id=user.id) }}" method="POST"
+                            style="display: inline;">
+                            <button type="submit" class="btn-secondary"
+                                style="background: {% if user.is_admin %}rgba(255, 0, 50, 0.1){% else %}rgba(0, 100, 255, 0.1){% endif %}; color: {% if user.is_admin %}var(--primary-color){% else %}var(--accent-color){% endif %}; border: 1px solid {% if user.is_admin %}rgba(255, 0, 50, 0.2){% else %}rgba(0, 100, 255, 0.2){% endif %}; padding: 0.5rem 1rem; font-size: 0.8rem;">
+                                {% if user.is_admin %}Demote to User{% else %}Promote to Admin{% endif %}
+                            </button>
+                        </form>
+                        {% else %}
+                        <span style="opacity: 0.4; font-size: 0.8rem; font-style: italic;">(You)</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div style="margin-top: 2rem; text-align: center;">
+        <a href="{{ url_for('admin.dashboard') }}"
+            style="color: white; opacity: 0.6; text-decoration: none; font-size: 0.9rem;"><i
+                class="fas fa-arrow-left"></i> Back to Dashboard</a>
+    </div>
+</div>
+{% endblock %}
