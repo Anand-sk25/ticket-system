@@ -121,15 +121,7 @@ def verify_ticket(code):
         db.session.commit()
         first_scan = True
     else:
-        # Check if the SAME admin is scanning again
-        if ticket.scanned_by_id == current_user.id:
-            # User wants: "if the same admin... not say to verify again"
-            # This means we treat it like a "success/first scan" result to suppress the warning
-            first_scan = True
-        else:
-            # Grace period logic removed as we now track precisely who scanned it
-            # Different admin or much later scan by someone else (though only admins can scan)
-            first_scan = False
+        first_scan = False
     
     return render_template('booking/verify_result.html', 
                            valid=True, 
@@ -138,6 +130,50 @@ def verify_ticket(code):
                            user=user, 
                            seat=ticket.seat_number,
                            first_scan=first_scan)
+
+
+@booking_bp.route('/verify-api/<code>')
+@login_required
+def verify_ticket_api(code):
+    """JSON endpoint used by the scanner for inline result display."""
+    if not current_user.is_admin:
+        return jsonify({'status': 'error', 'message': 'Access denied.'}), 403
+
+    ticket = Ticket.query.filter_by(unique_code=code).first()
+    if not ticket:
+        return jsonify({'status': 'invalid', 'message': 'Ticket not found. This code is not valid.'})
+
+    booking = Booking.query.get(ticket.booking_id)
+    event = booking.event
+    user = booking.user
+    now = datetime.utcnow()
+
+    if ticket.is_scanned:
+        # Already scanned — return warning details
+        scanned_at_str = ticket.scanned_at.strftime('%b %d, %Y at %I:%M %p') if ticket.scanned_at else 'Unknown time'
+        return jsonify({
+            'status': 'already_scanned',
+            'message': 'This ticket has already been used.',
+            'scanned_at': scanned_at_str,
+            'attendee': user.username,
+            'event': event.title,
+            'seat': ticket.seat_number or 'General',
+            'ticket_code': ticket.unique_code
+        })
+
+    # First valid scan — mark it
+    ticket.is_scanned = True
+    ticket.scanned_at = now
+    ticket.scanned_by_id = current_user.id
+    db.session.commit()
+
+    return jsonify({
+        'status': 'valid',
+        'attendee': user.username,
+        'event': event.title,
+        'seat': ticket.seat_number or 'General',
+        'ticket_code': ticket.unique_code
+    })
 
 @booking_bp.route('/scanner')
 @login_required
