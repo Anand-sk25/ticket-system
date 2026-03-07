@@ -80,10 +80,58 @@ def create_app():
         from flask import flash, redirect, url_for, request as req
         flash('File is too large. Maximum upload size is 16MB.', 'error')
         return redirect(req.referrer or url_for('main.index'))
+        
+    def run_migrations():
+        """Automatically add missing columns to existing tables in production."""
+        try:
+            # Check User table for semester column
+            with db.engine.connect() as conn:
+                # For PostgreSQL/SQLite compatibility, we check column existence
+                inspector = db.inspect(db.engine)
+                
+                # Migrate User table
+                user_cols = [c['name'] for c in inspector.get_columns('user')]
+                if 'semester' not in user_cols:
+                    db.session.execute(db.text('ALTER TABLE "user" ADD COLUMN semester VARCHAR(100)'))
+                if 'phone' not in user_cols:
+                    db.session.execute(db.text('ALTER TABLE "user" ADD COLUMN phone VARCHAR(20)'))
+                if 'department' not in user_cols:
+                    db.session.execute(db.text('ALTER TABLE "user" ADD COLUMN department VARCHAR(100)'))
+                
+                # Migrate Event table
+                event_cols = [c['name'] for c in inspector.get_columns('event')]
+                if 'is_seated' not in event_cols:
+                    db.session.execute(db.text('ALTER TABLE event ADD COLUMN is_seated BOOLEAN DEFAULT TRUE'))
+                if 'total_seats' not in event_cols:
+                    db.session.execute(db.text('ALTER TABLE event ADD COLUMN total_seats INTEGER DEFAULT 100'))
+                if 'organized_by' not in event_cols:
+                    db.session.execute(db.text('ALTER TABLE event ADD COLUMN organized_by VARCHAR(100)'))
+                if 'ticket_image_filename' not in event_cols:
+                    db.session.execute(db.text('ALTER TABLE event ADD COLUMN ticket_image_filename VARCHAR(200)'))
+                if 'ticket_image_url' not in event_cols:
+                    db.session.execute(db.text('ALTER TABLE event ADD COLUMN ticket_image_url VARCHAR(500)'))
+
+                # Migrate Ticket table for scanning fields
+                ticket_cols = [c['name'] for c in inspector.get_columns('ticket')]
+                if 'is_scanned' not in ticket_cols:
+                    db.session.execute(db.text('ALTER TABLE ticket ADD COLUMN is_scanned BOOLEAN DEFAULT FALSE'))
+                if 'scanned_at' not in ticket_cols:
+                    db.session.execute(db.text('ALTER TABLE ticket ADD COLUMN scanned_at TIMESTAMP'))
+                if 'scanned_by_id' not in ticket_cols:
+                    db.session.execute(db.text('ALTER TABLE ticket ADD COLUMN scanned_by_id INTEGER'))
+                if 'generated_at' not in ticket_cols:
+                    db.session.execute(db.text('ALTER TABLE ticket ADD COLUMN generated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP'))
+                
+                db.session.commit()
+                print("Migrations completed successfully.")
+        except Exception as e:
+            db.session.rollback()
+            print(f"Migration Error: {e}")
 
     # Initialize database and seed admin
     with app.app_context():
         db.create_all()
+        run_migrations()
         
         # Auto-seed admin from environment variables or default email
         admin_email = os.environ.get('ADMIN_EMAIL') or 'ask208238@gmail.com'
