@@ -80,7 +80,7 @@ def migrate():
         for u in users:
             new_u = User(id=u['id'], username=u['username'], email=u['email'], 
                          password_hash=u['password_hash'], phone=u['phone'], 
-                         branch=u['branch'], department=u['department'], is_admin=u['is_admin'])
+                         semester=u.get('semester', u.get('branch')), department=u['department'], is_admin=u['is_admin'])
             live_session.merge(new_u)
         
         # 3. Sync Events

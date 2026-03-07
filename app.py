@@ -1,8 +1,12 @@
 from flask import Flask
 from extensions import db, login_manager
 import os
+from dotenv import load_dotenv
 
 def create_app():
+    # Load environment variables from .env file
+    load_dotenv()
+    
     app = Flask(__name__)
     app.config['SECRET_KEY'] = 'dev_secret_key_change_in_production'
     
@@ -14,7 +18,7 @@ def create_app():
         upload_path = os.path.join('/tmp', 'uploads')
     else:
         db_path = os.path.join(app.instance_path, 'mgm_events.db')
-        upload_path = os.path.join(app.root_path, 'static/uploads')
+        upload_path = os.path.join(app.root_path, 'static', 'uploads')
 
     # Database Configuration
     DATABASE_URL = os.environ.get('DATABASE_URL')
@@ -28,11 +32,22 @@ def create_app():
         
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['UPLOAD_FOLDER'] = upload_path
+    app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB max upload size
+
+    # Mail Configuration
+    app.config['MAIL_SERVER'] = os.environ.get('MAIL_SERVER', 'smtp.gmail.com')
+    app.config['MAIL_PORT'] = int(os.environ.get('MAIL_PORT', 587))
+    app.config['MAIL_USE_TLS'] = os.environ.get('MAIL_USE_TLS', 'True').lower() in ['true', '1', 't']
+    app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
+    app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
+    app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER', app.config['MAIL_USERNAME'])
 
     # Initialize Extensions
+    from extensions import db, login_manager, mail
     db.init_app(app)
     login_manager.init_app(app)
     login_manager.login_view = 'auth.login'
+    mail.init_app(app)
 
     # Ensure upload folder exists
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
@@ -58,6 +73,14 @@ def create_app():
     app.register_blueprint(admin_bp)
     app.register_blueprint(booking_bp)
 
+    # Handle file too large errors gracefully
+    from flask import jsonify
+    @app.errorhandler(413)
+    def file_too_large(e):
+        from flask import flash, redirect, url_for, request as req
+        flash('File is too large. Maximum upload size is 16MB.', 'error')
+        return redirect(req.referrer or url_for('main.index'))
+
     # Initialize database and seed admin
     with app.app_context():
         db.create_all()
@@ -74,7 +97,7 @@ def create_app():
                 email=admin_email,
                 password_hash=generate_password_hash(admin_password),
                 is_admin=True,
-                branch='Admin',
+                semester='Admin',
                 department='Administration'
             )
             db.session.add(new_admin)
@@ -96,4 +119,4 @@ def create_app():
 app = create_app()
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)

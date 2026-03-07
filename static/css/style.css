@@ -280,32 +280,73 @@ input:focus {
     cursor: pointer;
 }
 
+/* App-Like Bottom Navigation */
+.mobile-bottom-nav {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: rgba(11, 2, 2, 0.95);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-top: 1px solid var(--glass-border);
+    z-index: 2000;
+    padding-bottom: env(safe-area-inset-bottom);
+}
+
+.mobile-bottom-nav .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #a1a1aa;
+    text-decoration: none;
+    font-size: 0.7rem;
+    padding: 0.6rem 0;
+    transition: color 0.3s;
+    width: 25%;
+}
+
+.mobile-bottom-nav .nav-item i {
+    font-size: 1.25rem;
+    margin-bottom: 0.3rem;
+    color: inherit;
+}
+
+.mobile-bottom-nav .nav-item:hover,
+.mobile-bottom-nav .nav-item:active {
+    color: var(--primary-color);
+}
+
 @media (max-width: 768px) {
+
+    /* Hide the top navbar elements except the logo */
     .menu-toggle {
-        display: block;
+        display: none !important;
     }
 
     .nav-links {
-        display: none;
-        position: absolute;
-        top: 100%;
-        left: 0;
-        width: 100%;
-        background: rgba(15, 23, 42, 0.95);
-        flex-direction: column;
-        padding: 2rem;
-        border-bottom: 1px solid var(--glass-border);
-        backdrop-filter: blur(10px);
+        display: none !important;
     }
 
-    .nav-links.active {
+    .navbar {
+        justify-content: center;
+        padding: 1rem 5%;
+    }
+
+    /* Show the bottom navigation */
+    .mobile-bottom-nav {
         display: flex;
+        justify-content: space-around;
     }
 
-    .nav-links a {
-        margin: 1rem 0;
-        font-size: 1.1rem;
-        margin-left: 0;
+    /* Adjust main container to account for bottom nav */
+    .container {
+        padding: 0 1rem;
+        margin-top: 1rem;
+        padding-bottom: 80px;
+        /* Space for bottom nav */
     }
 
     .btn-secondary,
@@ -314,6 +355,8 @@ input:focus {
         text-align: center;
         width: 100%;
         margin-top: 1rem;
+        min-height: 44px;
+        /* Accessible touch target */
     }
 
     .user-greeting {
@@ -321,17 +364,17 @@ input:focus {
         display: block;
     }
 
-    .container {
-        padding: 0 1rem;
-        margin-top: 1rem;
-    }
-
     .card {
-        padding: 1.5rem;
+        padding: 1.25rem;
+        border-radius: 16px;
     }
 
     h1 {
-        font-size: 2rem !important;
+        font-size: 1.7rem !important;
+    }
+
+    h2 {
+        font-size: 1.4rem !important;
     }
 
     /* Admin dashboard tables */
@@ -342,13 +385,13 @@ input:focus {
 
     /* Seat Selection Mobile adjustments */
     .seat {
-        width: 25px !important;
-        height: 25px !important;
+        width: 28px !important;
+        height: 28px !important;
         border-radius: 4px !important;
     }
 
     .seat-row {
-        gap: 0.3rem !important;
+        gap: 0.4rem !important;
     }
 }
 
@@ -385,7 +428,7 @@ input:focus {
     margin-bottom: 0.5rem;
 }
 
-/* Ticket Styling - Horizontal Stub Redesign */
+/* Ticket Styling - Portrait Redesign */
 .ticket-container {
     display: flex;
     flex-direction: column;
@@ -396,21 +439,23 @@ input:focus {
 
 .ticket {
     background: #0f172a;
-    /* Dark background for the main part */
     color: white;
-    width: 100%;
-    max-width: 700px;
-    height: 280px;
-    border-radius: 20px;
+    width: 350px;
+    height: 525px;
+    /* Exactly 2:3 aspect ratio */
+    min-width: 350px;
+    min-height: 525px;
+    flex-shrink: 0;
+    border-radius: 12px;
+    /* Sharper corners for a poster */
     display: flex;
+    flex-direction: column;
     position: relative;
     box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
     overflow: hidden;
     transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
+    background-size: cover;
     background-position: center;
-    perspective: 1000px;
 }
 
 .ticket::before {
@@ -420,84 +465,19 @@ input:focus {
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(15, 23, 42, 0.4);
+    background: linear-gradient(to top, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.3));
     z-index: 1;
 }
 
 .ticket:hover {
-    transform: translateY(-10px) rotateX(5deg);
+    transform: translateY(-10px);
     box-shadow: 0 40px 80px rgba(225, 29, 72, 0.3);
-}
-
-/* Left Stub Section */
-.ticket-stub {
-    width: 30%;
-    background: rgba(255, 255, 255, 0.01);
-    background-image: radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.02) 1px, transparent 0);
-    background-size: 10px 10px;
-    /* Variety Pattern */
-    padding: 1.5rem;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    position: relative;
-    border-right: 2px dashed rgba(255, 255, 255, 0.15);
-    z-index: 2;
-    backdrop-filter: blur(6px);
-}
-
-.ticket-stub::before,
-.ticket-stub::after {
-    content: '';
-    position: absolute;
-    right: -11px;
-    width: 20px;
-    height: 20px;
-    background: var(--bg-color);
-    border-radius: 50%;
-    z-index: 5;
-}
-
-.ticket-stub::before {
-    top: -10px;
-}
-
-.ticket-stub::after {
-    bottom: -10px;
-}
-
-.stub-vertical-text {
-    writing-mode: vertical-rl;
-    transform: rotate(180deg);
-    text-transform: uppercase;
-    font-weight: 700;
-    font-size: 1.2rem;
-    letter-spacing: 2px;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0.9;
-    color: var(--primary-color);
-    text-shadow: 0 0 10px rgba(255, 0, 50, 0.5);
-}
-
-.seat-number-text {
-    color: white;
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
-}
-
-.stub-info {
-    font-size: 0.7rem;
-    opacity: 0.8;
-    color: white;
-    text-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
 }
 
 /* Main Section */
 .ticket-main {
     flex: 1;
-    padding: 1.5rem 2rem;
+    padding: 2.5rem;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -505,15 +485,30 @@ input:focus {
     z-index: 2;
 }
 
-/* Overlay to make text readable on background images */
-.ticket-main-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(to right, rgba(15, 23, 42, 0.7), rgba(15, 23, 42, 0.3));
-    z-index: -1;
+/* Bottom Information Section */
+.ticket-stub {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 1.5rem 2.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+    backdrop-filter: blur(10px);
+}
+
+.stub-info {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    color: white;
+}
+
+.seat-number-text {
+    color: white;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+    font-size: 1.5rem;
+    font-weight: bold;
 }
 
 .ticket-content {
@@ -522,7 +517,7 @@ input:focus {
     height: 100%;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    gap: 1.5rem;
 }
 
 .ticket-event-tag {
@@ -546,9 +541,13 @@ input:focus {
 
 .ticket-details-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.5rem;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
     margin-top: 1rem;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 1rem;
+    border-radius: 12px;
+    backdrop-filter: blur(5px);
 }
 
 .detail-item label {
@@ -574,78 +573,29 @@ input:focus {
 }
 
 .ticket-qr-section {
-    position: absolute;
-    right: 2rem;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 2;
-    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 1.5rem;
+    background: white;
+    padding: 10px;
+    border-radius: 16px;
+    width: fit-content;
+    margin-inline: auto;
 }
 
 .ticket-qr-image {
-    width: 120px;
-    height: 120px;
-    background: white;
-    padding: 8px;
-    border-radius: 12px;
-    margin-bottom: 0.5rem;
+    width: 130px;
+    height: 130px;
+    margin-bottom: 0.2rem;
 }
 
 .booking-id {
-    font-size: 0.6rem;
-    color: white;
+    font-size: 0.7rem;
+    color: #333;
+    /* Dark text for white background */
     font-family: monospace;
-    opacity: 0.6;
-}
-
-@media (max-width: 768px) {
-    .ticket {
-        height: auto;
-        flex-direction: column;
-    }
-
-    .ticket-stub {
-        width: 100%;
-        height: 100px;
-        flex-direction: row;
-        border-right: none;
-        border-bottom: 2px dashed rgba(255, 255, 255, 0.3);
-    }
-
-    .ticket-stub::before,
-    .ticket-stub::after {
-        left: -10px;
-        right: auto;
-        top: auto;
-        bottom: auto;
-    }
-
-    .ticket-stub::before {
-        bottom: -10px;
-        top: auto;
-        left: 10%;
-    }
-
-    .ticket-stub::after {
-        bottom: -10px;
-        top: auto;
-        right: 10%;
-    }
-
-    .stub-vertical-text {
-        writing-mode: horizontal-tb;
-        transform: none;
-        height: auto;
-    }
-
-    .ticket-qr-section {
-        position: static;
-        transform: none;
-        margin-top: 1.5rem;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
+    font-weight: 600;
 }
 
 @media print {
@@ -680,20 +630,18 @@ input:focus {
         left: 5%;
         top: 2rem;
         width: 90% !important;
-        max-width: 700px;
+        max-width: 380px;
         box-shadow: none !important;
         break-inside: avoid;
         page-break-inside: avoid;
-        margin: 0 !important;
+        margin: 0 auto !important;
         transform: none !important;
     }
 
-    /* Hide the main right-side overlay so the shade is only on the left side stub */
     .ticket-main-overlay {
         display: none !important;
     }
 
-    /* Flawless background shading via absolute pseudo-element mapping */
     .ticket::before {
         content: '' !important;
         position: absolute !important;
@@ -701,37 +649,32 @@ input:focus {
         left: 0 !important;
         bottom: 0 !important;
         right: 0 !important;
-        /* Left 30% is solid deep blue, right 70% is a lighter semi-transparent shade */
-        background: linear-gradient(to right, rgba(10, 15, 25, 0.95) 0%, rgba(10, 15, 25, 0.95) 30%, rgba(10, 15, 25, 0.4) 30%, rgba(10, 15, 25, 0.2) 100%) !important;
+        background: rgba(10, 15, 25, 0.95) !important;
         z-index: 1 !important;
         border-radius: 20px !important;
     }
 
-    /* Force the text and QR code to render on top of the overlay */
-    .ticket-content {
+    .ticket-content,
+    .ticket-stub,
+    .ticket-qr-section {
         position: relative !important;
         z-index: 10 !important;
     }
 
-    /* Keep text on top, background handled by ::before */
     .ticket-stub {
-        position: relative !important;
-        z-index: 10 !important;
         background: transparent !important;
     }
 
-    .ticket-qr-section {
-        position: absolute !important;
-        z-index: 10 !important;
-    }
-
-    /* Explicitly force white text because browsers invert it */
     .ticket-event-tag,
     .detail-item label,
-    .booking-id,
     .stub-info {
         color: white !important;
         opacity: 0.9 !important;
+    }
+
+    .booking-id {
+        color: #333 !important;
+        /* On white QR background */
     }
 
     .detail-item span,
@@ -739,9 +682,8 @@ input:focus {
         color: white !important;
     }
 
-    /* Explicitly force colored text */
     .ticket-event-title,
-    .stub-vertical-text {
+    .stub-horizontal-text {
         color: var(--primary-color) !important;
         -webkit-text-fill-color: var(--primary-color) !important;
     }

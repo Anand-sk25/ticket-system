@@ -59,6 +59,31 @@
         <p>&copy; 2026 MGM Events. All rights reserved.</p>
     </footer>
 
+    <!-- Mobile Bottom Navigation (App-like experience) -->
+    <nav class="mobile-bottom-nav">
+        <a href="{{ url_for('main.index') }}" class="nav-item">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </a>
+        {% if current_user.is_authenticated %}
+        <a href="{{ url_for('main.dashboard') }}" class="nav-item">
+            <i class="fas fa-ticket-alt"></i>
+            <span>Tickets</span>
+        </a>
+        {% if current_user.is_admin %}
+        <a href="{{ url_for('admin.dashboard') }}" class="nav-item">
+            <i class="fas fa-qrcode"></i>
+            <span>Admin</span>
+        </a>
+        {% endif %}
+        {% else %}
+        <a href="{{ url_for('auth.login') }}" class="nav-item">
+            <i class="fas fa-sign-in-alt"></i>
+            <span>Login</span>
+        </a>
+        {% endif %}
+    </nav>
+
     <script>
         document.getElementById('menu-toggle').addEventListener('click', function () {
             document.getElementById('nav-links').classList.toggle('active');

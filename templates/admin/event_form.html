@@ -35,9 +35,9 @@
             </div>
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
             <div class="form-group">
-                <label for="price">Price ($)</label>
+                <label for="price">Price (₹)</label>
                 <input type="number" step="0.01" id="price" name="price" required
                     value="{{ event.price if event else '' }}">
             </div>
@@ -45,6 +45,15 @@
                 <label for="total_seats">Total Seats</label>
                 <input type="number" id="total_seats" name="total_seats" required
                     value="{{ event.total_seats if event else 100 }}">
+            </div>
+            <div class="form-group">
+                <label for="is_seated">Admission Type</label>
+                <select id="is_seated" name="is_seated" required>
+                    <option value="true" {% if not event or event.is_seated %}selected{% endif %}>Seated (Assign Seats)
+                    </option>
+                    <option value="false" {% if event and not event.is_seated %}selected{% endif %}>Open (General
+                        Admission)</option>
+                </select>
             </div>
         </div>
 

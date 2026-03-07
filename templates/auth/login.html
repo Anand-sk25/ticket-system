@@ -4,28 +4,324 @@
 
 {% block content %}
 <div class="auth-container">
-    <div class="card">
-        <h2 class="auth-title">Welcome Back</h2>
-        <form method="POST" action="{{ url_for('auth.login') }}">
+    <div class="auth-card">
+        <div class="auth-header">
+            <div class="auth-icon-wrapper">
+                <i class="fas fa-user-circle"></i>
+            </div>
+            <h2 class="auth-title">Welcome Back</h2>
+            <p class="auth-subtitle">Log in to access your dashboard and tickets</p>
+        </div>
+
+        <form method="POST" action="{{ url_for('auth.login') }}" class="auth-form">
             <div class="form-group">
                 <label for="email">Email Address</label>
-                <input type="email" id="email" name="email" required placeholder="name@example.com">
+                <div class="input-icon">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" id="email" name="email" required placeholder="name@example.com">
+                </div>
             </div>
+
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" id="password" name="password" required placeholder="Enter your password">
+                <div class="input-icon">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="password" name="password" required placeholder="Enter your password">
+                    <button type="button" class="toggle-password" onclick="togglePasswordVisibility('password')">
+                        <i class="fas fa-eye" id="password-eye"></i>
+                    </button>
+                </div>
             </div>
-            <div class="form-group" style="display: flex; align-items: center; gap: 10px; margin-bottom: 1.5rem;">
-                <input type="checkbox" id="remember" name="remember" style="width: auto; margin-bottom: 0;">
-                <label for="remember"
-                    style="margin-bottom: 0; font-size: 0.9rem; opacity: 0.8; cursor: pointer;">Remember Me (Highly
-                    recommended for scanning)</label>
+
+            <div class="form-options">
+                <label class="checkbox-container">
+                    <input type="checkbox" id="remember" name="remember">
+                    <span class="checkmark"></span>
+                    <span class="checkbox-label">Remember Me <span class="badge">Scanner Recommended</span></span>
+                </label>
             </div>
-            <button type="submit" class="btn-primary" style="width: 100%;">Login</button>
+
+            <button type="submit" class="btn-primary auth-btn">
+                <span>Sign In</span>
+                <i class="fas fa-sign-in-alt"></i>
+            </button>
         </form>
-        <p style="margin-top: 1rem; text-align: center;">
-            Don't have an account? <a href="{{ url_for('auth.register') }}" class="highlight">Sign Up</a>
-        </p>
+
+        <div class="auth-footer">
+            <p>Don't have an account? <a href="{{ url_for('auth.register') }}" class="highlight-link">Sign Up</a></p>
+        </div>
     </div>
 </div>
+
+<style>
+    .auth-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: calc(100vh - 200px);
+        padding: 2rem 1rem;
+    }
+
+    .auth-card {
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 24px;
+        padding: 3rem 2.5rem;
+        width: 100%;
+        max-width: 480px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+        animation: fade-in-up 0.5s ease;
+    }
+
+    .auth-header {
+        text-align: center;
+        margin-bottom: 2.5rem;
+    }
+
+    .auth-icon-wrapper {
+        width: 64px;
+        height: 64px;
+        background: linear-gradient(135deg, rgba(255, 0, 50, 0.2), rgba(0, 100, 255, 0.1));
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        font-size: 2rem;
+        color: var(--primary-color);
+        box-shadow: 0 0 20px rgba(255, 0, 50, 0.1);
+    }
+
+    .auth-title {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        background: linear-gradient(135deg, #fff, #a1a1aa);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .auth-subtitle {
+        color: #a1a1aa;
+        font-size: 0.95rem;
+    }
+
+    .auth-form {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: #e4e4e7;
+        margin-bottom: 0.5rem;
+        letter-spacing: 0.5px;
+    }
+
+    .input-icon {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .input-icon i:first-child {
+        position: absolute;
+        left: 1rem;
+        color: #71717a;
+        font-size: 0.9rem;
+        transition: color 0.3s ease;
+    }
+
+    .input-icon input {
+        width: 100%;
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 0.85rem 1rem 0.85rem 2.8rem;
+        color: #fff;
+        font-family: inherit;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+    }
+
+    .input-icon input:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        background: rgba(0, 0, 0, 0.4);
+        box-shadow: 0 0 0 4px rgba(255, 0, 50, 0.1);
+    }
+
+    .input-icon input:focus+i,
+    .input-icon input:not(:placeholder-shown)~i:first-child {
+        color: var(--primary-color);
+    }
+
+    .toggle-password {
+        position: absolute;
+        right: 1rem;
+        background: none;
+        border: none;
+        color: #71717a;
+        cursor: pointer;
+        padding: 0;
+        font-size: 0.9rem;
+        transition: color 0.3s ease;
+    }
+
+    .toggle-password:hover {
+        color: #e4e4e7;
+    }
+
+    .form-options {
+        display: flex;
+        align-items: center;
+        margin-top: -0.5rem;
+    }
+
+    /* Custom Checkbox */
+    .checkbox-container {
+        display: flex;
+        align-items: center;
+        position: relative;
+        padding-left: 28px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        color: #a1a1aa;
+        user-select: none;
+    }
+
+    .checkbox-container input {
+        position: absolute;
+        opacity: 0;
+        cursor: pointer;
+        height: 0;
+        width: 0;
+    }
+
+    .checkmark {
+        position: absolute;
+        top: 50%;
+        left: 0;
+        transform: translateY(-50%);
+        height: 18px;
+        width: 18px;
+        background-color: rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 4px;
+        transition: all 0.2s ease;
+    }
+
+    .checkbox-container:hover input~.checkmark {
+        border-color: rgba(255, 255, 255, 0.4);
+    }
+
+    .checkbox-container input:checked~.checkmark {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+    .checkmark:after {
+        content: "";
+        position: absolute;
+        display: none;
+    }
+
+    .checkbox-container input:checked~.checkmark:after {
+        display: block;
+    }
+
+    .checkbox-container .checkmark:after {
+        left: 5px;
+        top: 2px;
+        width: 4px;
+        height: 8px;
+        border: solid white;
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg);
+    }
+
+    .badge {
+        background: rgba(255, 0, 50, 0.15);
+        color: var(--primary-color);
+        font-size: 0.65rem;
+        padding: 0.15rem 0.4rem;
+        border-radius: 4px;
+        margin-left: 0.5rem;
+        border: 1px solid rgba(255, 0, 50, 0.3);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .auth-btn {
+        margin-top: 0.5rem;
+        padding: 1rem;
+        border-radius: 12px;
+        font-size: 1rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0.75rem;
+        width: 100%;
+        transition: all 0.3s ease;
+    }
+
+    .auth-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 15px 25px rgba(255, 0, 50, 0.3);
+    }
+
+    .auth-footer {
+        margin-top: 2rem;
+        text-align: center;
+        font-size: 0.9rem;
+        color: #a1a1aa;
+    }
+
+    .highlight-link {
+        color: var(--primary-color);
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.3s ease;
+    }
+
+    .highlight-link:hover {
+        color: #ff3366;
+        text-decoration: underline;
+    }
+
+    @keyframes fade-in-up {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
+<script>
+    function togglePasswordVisibility(inputId) {
+        const input = document.getElementById(inputId);
+        const icon = document.getElementById(inputId + '-eye');
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    }
+</script>
 {% endblock %}

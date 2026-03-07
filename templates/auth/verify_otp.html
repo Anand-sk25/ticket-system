@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+
+{% block title %}Verify Registration{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <div class="auth-icon-wrapper otp-icon">
+                <i class="fas fa-shield-alt"></i>
+            </div>
+            <h2 class="auth-title">Security Check</h2>
+            <p class="auth-subtitle">We need to verify it's you. Please enter the verification code to complete your
+                registration.</p>
+        </div>
+
+        <form method="POST" action="{{ url_for('auth.verify_otp') }}" class="auth-form" id="otpForm">
+            <div class="form-group text-center">
+                <label for="otp">Enter 6-Digit Code</label>
+                <!-- For production, a multi-input OTP field is nicer, but a single input is fine and reliable -->
+                <div class="otp-input-container">
+                    <input type="text" id="otp" name="otp" required pattern="\d{6}" maxlength="6" placeholder="••••••"
+                        autocomplete="one-time-code" class="otp-input">
+                </div>
+                <p class="otp-hint"><i class="fas fa-info-circle"></i> For testing, please enter the code displayed in
+                    the alert message at the top of your screen.</p>
+                <!-- For test environments without an email sender set up, the code will be in flash messages -->
+            </div>
+
+            <button type="submit" class="btn-primary auth-btn">
+                <span>Verify & Complete Registration</span>
+                <i class="fas fa-check-circle"></i>
+            </button>
+        </form>
+
+        <div class="auth-footer mt-4">
+            <p>Didn't receive the code? <a href="{{ url_for('auth.register') }}" class="highlight-link">Go back and try
+                    again</a></p>
+        </div>
+    </div>
+</div>
+
+<style>
+    .auth-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: calc(100vh - 200px);
+        padding: 2rem 1rem;
+    }
+
+    .auth-card {
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 24px;
+        padding: 3rem 2.5rem;
+        width: 100%;
+        max-width: 450px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+        animation: fade-in-up 0.5s ease;
+    }
+
+    .auth-header {
+        text-align: center;
+        margin-bottom: 2.5rem;
+    }
+
+    .auth-icon-wrapper {
+        width: 72px;
+        height: 72px;
+        background: linear-gradient(135deg, rgba(0, 200, 100, 0.2), rgba(0, 100, 255, 0.1));
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        font-size: 2.5rem;
+        color: #4ade80;
+        box-shadow: 0 0 25px rgba(0, 200, 100, 0.15);
+        animation: pulse 2s infinite;
+    }
+
+    .auth-title {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.75rem;
+        background: linear-gradient(135deg, #fff, #a1a1aa);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .auth-subtitle {
+        color: #a1a1aa;
+        font-size: 0.95rem;
+        line-height: 1.5;
+    }
+
+    .text-center {
+        text-align: center;
+    }
+
+    .form-group label {
+        display: block;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #e4e4e7;
+        margin-bottom: 1rem;
+        letter-spacing: 0.5px;
+    }
+
+    .otp-input-container {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 0.75rem;
+    }
+
+    .otp-input {
+        width: 200px;
+        height: 60px;
+        background: rgba(0, 0, 0, 0.3);
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        color: #fff;
+        font-family: monospace;
+        font-size: 2rem;
+        text-align: center;
+        letter-spacing: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .otp-input:focus {
+        outline: none;
+        border-color: #4ade80;
+        background: rgba(0, 0, 0, 0.5);
+        box-shadow: 0 0 0 4px rgba(74, 222, 128, 0.15);
+    }
+
+    .otp-input::placeholder {
+        color: rgba(255, 255, 255, 0.1);
+    }
+
+    .otp-hint {
+        font-size: 0.8rem;
+        color: #71717a;
+    }
+
+    .auth-btn {
+        margin-top: 1.5rem;
+        padding: 1rem;
+        border-radius: 12px;
+        font-size: 1rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0.75rem;
+        width: 100%;
+        background: linear-gradient(135deg, #10b981, #059669);
+        transition: all 0.3s ease;
+    }
+
+    .auth-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 15px 25px rgba(16, 185, 129, 0.3);
+    }
+
+    .auth-footer {
+        text-align: center;
+        font-size: 0.9rem;
+        color: #a1a1aa;
+        margin-top: 2rem;
+    }
+
+    .highlight-link {
+        color: var(--primary-color);
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.3s ease;
+    }
+
+    .highlight-link:hover {
+        color: #ff3366;
+        text-decoration: underline;
+    }
+
+    @keyframes fade-in-up {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes pulse {
+        0% {
+            transform: scale(1);
+            box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.4);
+        }
+
+        70% {
+            transform: scale(1.05);
+            box-shadow: 0 0 0 15px rgba(74, 222, 128, 0);
+        }
+
+        100% {
+            transform: scale(1);
+            box-shadow: 0 0 0 0 rgba(74, 222, 128, 0);
+        }
+    }
+</style>
+
+<script>
+    // Only allow numbers in OTP field
+    document.getElementById('otp').addEventListener('input', function (e) {
+        this.value = this.value.replace(/[^0-9]/g, '');
+    });
+</script>
+{% endblock %}

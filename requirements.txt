@@ -6,4 +6,5 @@ email_validator
 Werkzeug
 gunicorn
 psycopg2-binary
-
+Flask-Mail
+python-dotenv

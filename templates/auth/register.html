@@ -4,40 +4,370 @@
 
 {% block content %}
 <div class="auth-container">
-    <div class="card">
-        <h2 class="auth-title">Create Account</h2>
-        <form method="POST" action="{{ url_for('auth.register') }}">
-            <div class="form-group">
-                <label for="username">Full Name</label>
-                <input type="text" id="username" name="username" required placeholder="John Doe">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h2 class="auth-title">Create Account</h2>
+            <p class="auth-subtitle">Join us to book your favorite events</p>
+        </div>
+
+        <form method="POST" action="{{ url_for('auth.register') }}" class="auth-form" id="registerForm">
+            <div class="form-group flex-group">
+                <div class="input-wrapper">
+                    <label for="username">Full Name</label>
+                    <div class="input-icon">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="username" name="username" required placeholder="John Doe">
+                    </div>
+                </div>
+                <div class="input-wrapper">
+                    <label for="phone">Phone Number</label>
+                    <div class="input-icon">
+                        <i class="fas fa-phone"></i>
+                        <input type="tel" id="phone" name="phone" placeholder="+91 9876543210" maxlength="10"
+                            pattern="[0-9]{10}" title="Must be a 10-digit number">
+                    </div>
+                </div>
             </div>
+
             <div class="form-group">
                 <label for="email">Email Address</label>
-                <input type="email" id="email" name="email" required placeholder="name@example.com">
-            </div>
-            <div class="form-group">
-                <label for="phone">Phone Number</label>
-                <input type="text" id="phone" name="phone" placeholder="+91 9876543210">
-            </div>
-            <div class="form-group" style="display: flex; gap: 1rem;">
-                <div style="flex: 1;">
-                    <label for="branch">Branch</label>
-                    <input type="text" id="branch" name="branch" placeholder="CSE" required>
+                <div class="input-icon">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" id="email" name="email" required placeholder="name@example.com"
+                        pattern=".*\.com$" title="Email must end with .com">
                 </div>
-                <div style="flex: 1;">
+            </div>
+
+            <div class="form-group flex-group">
+                <div class="input-wrapper">
+                    <label for="semester">Semester</label>
+                    <div class="input-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                        <input type="text" id="semester" name="semester" placeholder="e.g. Sem 6" required>
+                    </div>
+                </div>
+                <div class="input-wrapper">
                     <label for="department">Department</label>
-                    <input type="text" id="department" name="department" placeholder="Engineering" required>
+                    <div class="input-icon">
+                        <i class="fas fa-building"></i>
+                        <input type="text" id="department" name="department" placeholder="e.g. Engineering" required>
+                    </div>
                 </div>
             </div>
+
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" id="password" name="password" required placeholder="Create a strong password">
+                <div class="input-icon">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="password" name="password" required placeholder="Create a strong password"
+                        oninput="checkPasswordCriteria(this.value)">
+                    <button type="button" class="toggle-password" onclick="togglePasswordVisibility('password')">
+                        <i class="fas fa-eye" id="password-eye"></i>
+                    </button>
+                </div>
+
+                <div class="password-criteria" id="password-criteria">
+                    <div class="criteria-item" id="crit-length"><i class="fas fa-circle"></i> At least 8 characters
+                    </div>
+                    <div class="criteria-item" id="crit-upper"><i class="fas fa-circle"></i> One uppercase letter</div>
+                    <div class="criteria-item" id="crit-lower"><i class="fas fa-circle"></i> One lowercase letter</div>
+                    <div class="criteria-item" id="crit-number"><i class="fas fa-circle"></i> One number</div>
+                    <div class="criteria-item" id="crit-special"><i class="fas fa-circle"></i> One special character
+                        (@$!%*?&_#-)</div>
+                </div>
             </div>
-            <button type="submit" class="btn-primary" style="width: 100%;">Sign Up</button>
+
+            <button type="submit" class="btn-primary auth-btn" id="submitBtn" disabled>
+                <span>Create Account</span>
+                <i class="fas fa-arrow-right"></i>
+            </button>
         </form>
-        <p style="margin-top: 1rem; text-align: center;">
-            Already have an account? <a href="{{ url_for('auth.login') }}" class="highlight">Login</a>
-        </p>
+
+        <div class="auth-footer">
+            <p>Already have an account? <a href="{{ url_for('auth.login') }}" class="highlight-link">Log in</a></p>
+        </div>
     </div>
 </div>
+
+<style>
+    .auth-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: calc(100vh - 200px);
+        padding: 2rem 1rem;
+    }
+
+    .auth-card {
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 24px;
+        padding: 2.5rem;
+        width: 100%;
+        max-width: 550px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+        animation: fade-in-up 0.5s ease;
+    }
+
+    .auth-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .auth-title {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        background: linear-gradient(135deg, #fff, #a1a1aa);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .auth-subtitle {
+        color: #a1a1aa;
+        font-size: 0.95rem;
+    }
+
+    .auth-form {
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+    }
+
+    .flex-group {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .flex-group .input-wrapper {
+        flex: 1;
+    }
+
+    .form-group label {
+        display: block;
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: #e4e4e7;
+        margin-bottom: 0.5rem;
+        letter-spacing: 0.5px;
+    }
+
+    .input-icon {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .input-icon i:first-child {
+        position: absolute;
+        left: 1rem;
+        color: #71717a;
+        font-size: 0.9rem;
+        transition: color 0.3s ease;
+    }
+
+    .input-icon input {
+        width: 100%;
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 0.85rem 1rem 0.85rem 2.8rem;
+        color: #fff;
+        font-family: inherit;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+    }
+
+    .input-icon input:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        background: rgba(0, 0, 0, 0.4);
+        box-shadow: 0 0 0 4px rgba(255, 0, 50, 0.1);
+    }
+
+    .input-icon input:focus+i,
+    .input-icon input:not(:placeholder-shown)~i:first-child {
+        color: var(--primary-color);
+    }
+
+    .toggle-password {
+        position: absolute;
+        right: 1rem;
+        background: none;
+        border: none;
+        color: #71717a;
+        cursor: pointer;
+        padding: 0;
+        font-size: 0.9rem;
+        transition: color 0.3s ease;
+    }
+
+    .toggle-password:hover {
+        color: #e4e4e7;
+    }
+
+    .password-criteria {
+        margin-top: 1rem;
+        padding: 1rem;
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 12px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+    }
+
+    .criteria-item {
+        font-size: 0.8rem;
+        color: #71717a;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .criteria-item i {
+        font-size: 0.5rem;
+    }
+
+    .criteria-item.valid {
+        color: #4ade80;
+    }
+
+    .criteria-item.valid i {
+        color: #4ade80;
+        transform: scale(1.2);
+    }
+
+    .auth-btn {
+        margin-top: 1rem;
+        padding: 1rem;
+        border-radius: 12px;
+        font-size: 1rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0.75rem;
+        width: 100%;
+        opacity: 0.5;
+        transition: all 0.3s ease;
+    }
+
+    .auth-btn:not([disabled]) {
+        opacity: 1;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(255, 0, 50, 0.2);
+    }
+
+    .auth-btn:not([disabled]):hover {
+        transform: translateY(-4px);
+        box-shadow: 0 15px 25px rgba(255, 0, 50, 0.3);
+    }
+
+    .auth-footer {
+        margin-top: 2rem;
+        text-align: center;
+        font-size: 0.9rem;
+        color: #a1a1aa;
+    }
+
+    .highlight-link {
+        color: var(--primary-color);
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.3s ease;
+    }
+
+    .highlight-link:hover {
+        color: #ff3366;
+        text-decoration: underline;
+    }
+
+    @keyframes fade-in-up {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @media (max-width: 600px) {
+        .flex-group {
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .password-criteria {
+            grid-template-columns: 1fr;
+        }
+
+        .auth-card {
+            padding: 2rem 1.5rem;
+        }
+    }
+</style>
+
+<script>
+    function togglePasswordVisibility(inputId) {
+        const input = document.getElementById(inputId);
+        const icon = document.getElementById(inputId + '-eye');
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    }
+
+    function checkPasswordCriteria(password) {
+        const criteria = {
+            length: password.length >= 8,
+            upper: /[A-Z]/.test(password),
+            lower: /[a-z]/.test(password),
+            number: /[0-9]/.test(password),
+            special: /[@$!%*?&_#-]/.test(password)
+        };
+
+        const updateItem = (id, isValid) => {
+            const el = document.getElementById('crit-' + id);
+            const icon = el.querySelector('i');
+            if (isValid) {
+                el.classList.add('valid');
+                icon.classList.remove('fa-circle', 'fa-times');
+                icon.classList.add('fa-check');
+            } else {
+                el.classList.remove('valid');
+                icon.classList.remove('fa-check', 'fa-times');
+                icon.classList.add('fa-circle');
+                if (password.length > 0) {
+                    icon.classList.remove('fa-circle');
+                    icon.classList.add('fa-times');
+                    icon.style.color = '#ef4444';
+                    el.style.color = '#ef4444';
+                } else {
+                    icon.style.color = '';
+                    el.style.color = '';
+                }
+            }
+        };
+
+        updateItem('length', criteria.length);
+        updateItem('upper', criteria.upper);
+        updateItem('lower', criteria.lower);
+        updateItem('number', criteria.number);
+        updateItem('special', criteria.special);
+
+        const allValid = Object.values(criteria).every(Boolean);
+        document.getElementById('submitBtn').disabled = !allValid;
+    }
+</script>
 {% endblock %}

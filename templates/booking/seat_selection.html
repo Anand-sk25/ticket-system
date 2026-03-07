@@ -10,6 +10,7 @@
     <div style="display: flex; gap: 2rem; flex-wrap: wrap; flex-direction: row;" class="booking-layout">
         <!-- Left: Seat Map -->
         <div style="flex: 2; min-width: 300px;" class="seat-map-section">
+            {% if event.is_seated %}
             <div class="stage-container" style="text-align: center; margin-bottom: 2rem;">
                 <div class="screen"
                     style="background: linear-gradient(to bottom, var(--secondary-color), transparent); height: 40px; width: 80%; margin: 0 auto; border-radius: 50% 50% 0 0 / 20px 20px 0 0; opacity: 0.5;">
@@ -38,6 +39,23 @@
                     </div> Booked
                 </div>
             </div>
+            {% else %}
+            <div
+                style="text-align: center; padding: 2rem; background: rgba(255,255,255,0.02); border-radius: 12px; border: 1px dashed var(--glass-border);">
+                <h3>General Admission</h3>
+                <p style="opacity: 0.7; margin: 1rem 0;">This event has open seating. Please select the number of
+                    tickets.</p>
+                <div
+                    style="display: inline-flex; align-items: center; gap: 1rem; background: rgba(0,0,0,0.4); padding: 1rem 2rem; border-radius: 20px; border: 1px solid var(--glass-border);">
+                    <button id="minus-qty" class="btn-secondary"
+                        style="padding: 0.5rem 1rem; font-size: 1.2rem; border-color: rgba(255,255,255,0.2);">-</button>
+                    <span id="ticket-qty-display"
+                        style="font-size: 1.5rem; font-weight: bold; width: 40px; display: inline-block; text-align: center;">1</span>
+                    <button id="add-qty" class="btn-secondary"
+                        style="padding: 0.5rem 1rem; font-size: 1.2rem; border-color: rgba(255,255,255,0.2);">+</button>
+                </div>
+            </div>
+            {% endif %}
         </div>
 
         <!-- Right: Summary -->
@@ -58,7 +76,7 @@
                 <div
                     style="display: flex; justify-content: space-between; font-size: 1.2rem; font-weight: 700; margin-top: 1rem;">
                     <span>Total:</span>
-                    <span id="total-price">$0.00</span>
+                    <span id="total-price">₹0.00</span>
                 </div>
 
                 <button onclick="proceedToPayment()" class="btn-primary"
@@ -73,6 +91,7 @@
     const PRICE_PER_SEAT = {{ event.price }};
     const BOOKED_SEATS = {{ booked_seats| tojson }};
     const TOTAL_SEATS = {{ event.total_seats }};
+    const IS_SEATED = {{ 'true' if event.is_seated else 'false' }};
 </script>
 <script src="{{ url_for('static', filename='js/seat_booking.js') }}"></script>
 {% endblock %}

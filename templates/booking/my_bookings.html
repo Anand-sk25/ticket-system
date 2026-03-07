@@ -22,7 +22,7 @@
                 <tr style="border-bottom: 1px solid var(--glass-border);">
                     <td style="padding: 1rem;">{{ booking.event.title }}</td>
                     <td style="padding: 1rem;">{{ booking.event.date_time.strftime('%b %d, %Y') }}</td>
-                    <td style="padding: 1rem;">${{ booking.total_amount }}</td>
+                    <td style="padding: 1rem;">₹{{ booking.total_amount }}</td>
                     <td style="padding: 1rem;">
                         {% if booking.status == 'confirmed' %}
                         <span style="color: #4ade80;"><i class="fas fa-check-circle"></i> Confirmed</span>

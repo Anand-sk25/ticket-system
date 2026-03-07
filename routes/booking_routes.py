@@ -1,9 +1,11 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify
+from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify, send_file
 from flask_login import login_required, current_user
 from models import Event, Booking, Ticket, Seat, Coupon
 from extensions import db
 import uuid
 from datetime import datetime
+import qrcode
+import io
 
 booking_bp = Blueprint('booking', __name__, url_prefix='/book')
 
@@ -54,11 +56,15 @@ def confirm_booking():
         seat_num = int(seat_label[1:])
         
         # Update Seat status in DB
-        seat = Seat.query.filter_by(event_id=event.id, row=row_label, number=seat_num).first()
-        if seat:
-            if seat.status == 'booked':
-                return jsonify({'status': 'error', 'message': f'Seat {seat_label} is already booked.'}), 400
-            seat.status = 'booked'
+        if event.is_seated:
+            seat = Seat.query.filter_by(event_id=event.id, row=row_label, number=seat_num).first()
+            if seat:
+                if seat.status == 'booked':
+                    return jsonify({'status': 'error', 'message': f'Seat {seat_label} is already booked.'}), 400
+                seat.status = 'booked'
+        else:
+            seat = None
+            seat_label = "General Admission"
         
         # Generate unique code
         unique_code = str(uuid.uuid4()).split('-')[0].upper()
@@ -174,6 +180,25 @@ def verify_ticket_api(code):
         'seat': ticket.seat_number or 'General',
         'ticket_code': ticket.unique_code
     })
+
+@booking_bp.route('/qr/<code>')
+def generate_qr(code):
+    verify_url = url_for('booking.verify_ticket', code=code, _external=True)
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=10,
+        border=0,
+    )
+    qr.add_data(verify_url)
+    qr.make(fit=True)
+    img = qr.make_image(fill_color="black", back_color="white")
+    
+    img_io = io.BytesIO()
+    img.save(img_io, 'PNG')
+    img_io.seek(0)
+    
+    return send_file(img_io, mimetype='image/png', max_age=86400)
 
 @booking_bp.route('/scanner')
 @login_required

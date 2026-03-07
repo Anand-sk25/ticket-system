@@ -8,7 +8,7 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(150), unique=True, nullable=False)
     password_hash = db.Column(db.String(200), nullable=False)
     phone = db.Column(db.String(20), nullable=True)
-    branch = db.Column(db.String(100), nullable=True)
+    semester = db.Column(db.String(100), nullable=True)
     department = db.Column(db.String(100), nullable=True)
     is_admin = db.Column(db.Boolean, default=False)
     bookings = db.relationship('Booking', backref='user', lazy=True)
@@ -24,6 +24,7 @@ class Event(db.Model):
     image_url = db.Column(db.String(500), nullable=True)
     organized_by = db.Column(db.String(100), nullable=True)
     total_seats = db.Column(db.Integer, default=100)
+    is_seated = db.Column(db.Boolean, default=True)
     ticket_image_filename = db.Column(db.String(200), nullable=True)
     ticket_image_url = db.Column(db.String(500), nullable=True)
     # We will manage seats dynamically or via Seat model if specific seat locking is required
