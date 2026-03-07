@@ -21,18 +21,22 @@ def dashboard():
 
 @main_bp.route('/uploads/<path:filename>')
 def uploaded_file(filename):
-    """Serve uploaded files. Tries ephemeral /tmp first, then persistent static/uploads fallback."""
-    # 1. Try the configured UPLOAD_FOLDER (might be /tmp on Vercel)
-    upload_folder = current_app.config['UPLOAD_FOLDER']
-    file_path = os.path.join(upload_folder, filename)
-    if os.path.exists(file_path):
-        return send_from_directory(upload_folder, filename)
+    """Serve uploaded files with multiple fallbacks for Vercel persistence."""
+    # 1. Check ephemeral storage (/tmp on Vercel)
+    tmp_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+    if os.path.exists(tmp_path):
+        return send_from_directory(current_app.config['UPLOAD_FOLDER'], filename)
     
-    # 2. Try the project's static/uploads folder (persistent images pushed via Git)
-    static_uploads = os.path.join(current_app.root_path, 'static', 'uploads')
-    static_path = os.path.join(static_uploads, filename)
-    if os.path.exists(static_path):
-        return send_from_directory(static_uploads, filename)
+    # 2. Check the repo's permanent static/uploads (for files pushed via Git)
+    # We use an absolute path based on the root of the app
+    static_repo_path = os.path.join(current_app.root_path, 'static', 'uploads', filename)
+    if os.path.exists(static_repo_path):
+        return send_from_directory(os.path.join(current_app.root_path, 'static', 'uploads'), filename)
     
-    # 3. Last resort: direct static lookup
+    # 3. Fallback to just the static folder generally
+    static_dir = os.path.join(current_app.root_path, 'static')
+    full_static_path = os.path.join(static_dir, filename)
+    if os.path.exists(full_static_path):
+        return send_from_directory(static_dir, filename)
+
     abort(404)
