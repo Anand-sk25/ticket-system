@@ -5,6 +5,16 @@
 {% block content %}
 <div class="card" style="max-width: 800px; margin: 0 auto;">
     <h2>{% if event %}Edit Event{% else %}Add New Event{% endif %}</h2>
+
+    {% if config.PERSISTENCE_WARNING %}
+    <div class="card"
+        style="background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; color: #fca5a5; margin-bottom: 2rem; padding: 1rem;">
+        <i class="fas fa-exclamation-triangle"></i> <strong>Vercel Alert:</strong>
+        Images uploaded here are <strong>temporary</strong> and will disappear after a few minutes.
+        For permanent images, please use the <strong>Image URL</strong> fields below.
+    </div>
+    {% endif %}
+
     <form method="POST" enctype="multipart/form-data">
         <div class="form-group">
             <label for="title">Event Title</label>
