@@ -8,3 +8,5 @@ gunicorn
 psycopg2-binary
 Flask-Mail
 python-dotenv
+qrcode
+Pillow
