@@ -100,6 +100,7 @@ def new_event():
         venue = request.form.get('venue')
         date_str = request.form.get('date_time')
         total_seats = int(request.form.get('total_seats'))
+        max_tickets_per_user = int(request.form.get('max_tickets_per_user', 5))
         is_seated = request.form.get('is_seated') == 'true'
         
         try:
@@ -129,7 +130,8 @@ def new_event():
             ticket_image_filename=None,
             ticket_image_url=request.form.get('ticket_image_url'),
             organized_by=request.form.get('organized_by'),
-            is_seated=is_seated
+            is_seated=is_seated,
+            max_tickets_per_user=max_tickets_per_user
         )
 
         if 'ticket_image' in request.files:
@@ -186,6 +188,7 @@ def edit_event(event_id):
         event.venue = request.form.get('venue')
         event.organized_by = request.form.get('organized_by')
         new_total_seats = int(request.form.get('total_seats'))
+        event.max_tickets_per_user = int(request.form.get('max_tickets_per_user', 5))
         event.is_seated = request.form.get('is_seated') == 'true'
         
         if event.is_seated:

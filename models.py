@@ -25,6 +25,7 @@ class Event(db.Model):
     organized_by = db.Column(db.String(100), nullable=True)
     total_seats = db.Column(db.Integer, default=100)
     is_seated = db.Column(db.Boolean, default=True)
+    max_tickets_per_user = db.Column(db.Integer, default=5)
     ticket_image_filename = db.Column(db.String(200), nullable=True)
     ticket_image_url = db.Column(db.String(500), nullable=True)
     # Relationships with explicit cascade behavior

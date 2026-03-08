@@ -110,6 +110,8 @@ def create_app():
                     db.session.execute(db.text('ALTER TABLE event ADD COLUMN ticket_image_filename VARCHAR(200)'))
                 if 'ticket_image_url' not in event_cols:
                     db.session.execute(db.text('ALTER TABLE event ADD COLUMN ticket_image_url VARCHAR(500)'))
+                if 'max_tickets_per_user' not in event_cols:
+                    db.session.execute(db.text('ALTER TABLE event ADD COLUMN max_tickets_per_user INTEGER DEFAULT 5'))
 
                 # Migrate Ticket table for scanning fields
                 ticket_cols = [c['name'] for c in inspector.get_columns('ticket')]

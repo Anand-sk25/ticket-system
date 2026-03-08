@@ -37,7 +37,22 @@ def confirm_booking():
         return jsonify({'status': 'error', 'message': 'This event has already passed. Booking is closed.'}), 400
         
     # Calculate total
-    total_amount = len(selected_seats) * event.price
+    tickets_to_book = len(selected_seats)
+    total_amount = tickets_to_book * event.price
+
+    # Check ticket limit per user
+    existing_tickets_count = db.session.query(Ticket).join(Booking).filter(
+        Booking.user_id == current_user.id,
+        Booking.event_id == event.id,
+        Booking.status != 'rejected'
+    ).count()
+
+    if existing_tickets_count + tickets_to_book > event.max_tickets_per_user:
+        remaining = max(0, event.max_tickets_per_user - existing_tickets_count)
+        return jsonify({
+            'status': 'error', 
+            'message': f'You can only book a maximum of {event.max_tickets_per_user} tickets for this event. You already have {existing_tickets_count} and are trying to book {tickets_to_book}. Remaining allowance: {remaining}.'
+        }), 400
     
     # Create Booking
     booking = Booking(
