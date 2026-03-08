@@ -122,6 +122,13 @@ def create_app():
                 if 'generated_at' not in ticket_cols:
                     db.session.execute(db.text('ALTER TABLE ticket ADD COLUMN generated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP'))
                 
+                # Attempt to increase seat_number length for Postgres
+                try:
+                    db.session.execute(db.text('ALTER TABLE ticket ALTER COLUMN seat_number TYPE VARCHAR(100)'))
+                except Exception:
+                    # Likely SQLite or already correct
+                    pass
+                
                 db.session.commit()
                 print("Migrations completed successfully.")
         except Exception as e:

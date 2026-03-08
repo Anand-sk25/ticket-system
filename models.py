@@ -53,7 +53,7 @@ class Ticket(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     booking_id = db.Column(db.Integer, db.ForeignKey('booking.id', ondelete='CASCADE'), nullable=False)
     seat_id = db.Column(db.Integer, db.ForeignKey('seat.id', ondelete='SET NULL'), nullable=True) # Optional if open seating
-    seat_number = db.Column(db.String(10), nullable=True) # e.g. "A1"
+    seat_number = db.Column(db.String(100), nullable=True) # e.g. "A1" or "General Admission"
     unique_code = db.Column(db.String(100), unique=True, nullable=False)
     is_scanned = db.Column(db.Boolean, default=False)
     scanned_at = db.Column(db.DateTime, nullable=True)
