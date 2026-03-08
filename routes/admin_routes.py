@@ -355,19 +355,24 @@ def delete_event(event_id):
                 except Exception as e:
                     print(f"Error deleting ticket image file: {e}")
 
-        # Manual cleanup of related objects just in case cascade fails on Vercel
-        # Delete all seats
-        Seat.query.filter_by(event_id=event.id).delete()
-        # Delete all coupons
-        Coupon.query.filter_by(event_id=event.id).delete()
-        
-        # Delete all bookings (this will naturally delete tickets due to cascades, but we can be explicit if needed)
+        # 1. First, find all bookings for this event
         bookings = Booking.query.filter_by(event_id=event.id).all()
-        for b in bookings:
-            Ticket.query.filter_by(booking_id=b.id).delete()
-            db.session.delete(b)
+        booking_ids = [b.id for b in bookings]
+        
+        # 2. Delete all tickets for these bookings (they reference seats)
+        if booking_ids:
+            Ticket.query.filter(Ticket.booking_id.in_(booking_ids)).delete(synchronize_session=False)
+            
+        # 3. Delete all bookings
+        Booking.query.filter_by(event_id=event.id).delete()
+        
+        # 4. Now safe to delete seats
+        Seat.query.filter_by(event_id=event.id).delete()
+        
+        # 5. Delete all coupons
+        Coupon.query.filter_by(event_id=event.id).delete()
 
-        # Finally delete the event
+        # 6. Finally delete the event
         db.session.delete(event)
         db.session.commit()
         
