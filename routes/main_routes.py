@@ -14,6 +14,13 @@ def index():
         event.is_past = event.date_time < now
     return render_template('index.html', events=events, now=now)
 
+@main_bp.route('/event/<int:event_id>')
+def event_details(event_id):
+    event = Event.query.get_or_404(event_id)
+    now = datetime.now()
+    event.is_past = event.date_time < now
+    return render_template('event_details.html', event=event)
+
 @main_bp.route('/dashboard')
 @login_required
 def dashboard():

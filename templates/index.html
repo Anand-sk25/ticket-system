@@ -49,7 +49,8 @@
         {% endif %}
 
         <!-- Card content sits at the bottom -->
-        <div class="event-card-body">
+        <div class="event-card-body"
+            onclick="window.location.href='{{ url_for('main.event_details', event_id=event.id) }}'">
             <div>
                 {% if event.organized_by %}
                 <p class="event-org-tag">{{ event.organized_by }}</p>
@@ -57,6 +58,8 @@
                 <h3 class="event-card-title">{{ event.title }}</h3>
                 <p class="event-card-desc">
                     {{ event.description[:80] }}{% if event.description|length > 80 %}…{% endif %}
+                    <span style="color: var(--primary-color); display: block; margin-top: 5px; font-weight: 600;">View
+                        Details <i class="fas fa-arrow-right" style="font-size: 0.7rem;"></i></span>
                 </p>
             </div>
 
@@ -71,7 +74,8 @@
                     {% if event.is_past %}
                     <button class="btn-book" disabled style="opacity:0.5; cursor:not-allowed;">Closed</button>
                     {% else %}
-                    <a href="{{ url_for('booking.select_seats', event_id=event.id) }}" class="btn-book">Book Now</a>
+                    <a href="{{ url_for('booking.select_seats', event_id=event.id) }}" class="btn-book"
+                        onclick="event.stopPropagation();">Book Now</a>
                     {% endif %}
                 </div>
             </div>

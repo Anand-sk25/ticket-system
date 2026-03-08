@@ -1,0 +1,261 @@
+{% extends "base.html" %}
+
+{% block title %}{{ event.title }}{% endblock %}
+
+{% block content %}
+<div class="event-details-container">
+    <div class="event-hero"
+        style="{% if event.image_url %}background-image: url('{{ event.image_url }}');{% elif event.image_filename %}background-image: url('{{ url_for('main.uploaded_file', filename=event.image_filename) }}');{% endif %}">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            {% if event.is_past %}
+            <span class="badge badge-past">Past Event</span>
+            {% else %}
+            <span class="badge badge-live">Live Event</span>
+            {% endif %}
+            <h1>{{ event.title }}</h1>
+            <div class="hero-meta">
+                <span><i class="fas fa-calendar-alt"></i> {{ event.date_time.strftime('%B %d, %Y') }}</span>
+                <span><i class="fas fa-clock"></i> {{ event.date_time.strftime('%I:%M %p') }}</span>
+                <span><i class="fas fa-map-marker-alt"></i> {{ event.venue }}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="details-grid">
+        <div class="details-main">
+            <div class="card glass">
+                <h3>About the Event</h3>
+                <div class="description-text">
+                    {{ event.description | replace('\n', '<br>') | safe }}
+                </div>
+            </div>
+        </div>
+
+        <div class="details-sidebar">
+            <div class="card glass price-card">
+                <div class="price-header">
+                    <span class="label">Ticket Price</span>
+                    <span class="price">₹{{ "%.0f"|format(event.price) }}</span>
+                </div>
+
+                <div class="info-list">
+                    {% if event.organized_by %}
+                    <div class="info-item">
+                        <i class="fas fa-user-tie"></i>
+                        <div>
+                            <span class="info-label">Organized By</span>
+                            <span class="info-value">{{ event.organized_by }}</span>
+                        </div>
+                    </div>
+                    {% endif %}
+                    <div class="info-item">
+                        <i class="fas fa-chair"></i>
+                        <div>
+                            <span class="info-label">Seating Type</span>
+                            <span class="info-value">{{ 'Reserved Seating' if event.is_seated else 'General Admission
+                                (Open)' }}</span>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-ticket-alt"></i>
+                        <div>
+                            <span class="info-label">Availability</span>
+                            <span class="info-value">{{ event.total_seats }} Seats Total</span>
+                        </div>
+                    </div>
+                </div>
+
+                {% if event.is_past %}
+                <button class="btn-primary" disabled
+                    style="width: 100%; margin-top: 1.5rem; opacity: 0.6; background: #666;">Booking Closed</button>
+                {% else %}
+                <a href="{{ url_for('booking.select_seats', event_id=event.id) }}" class="btn-primary"
+                    style="width: 100%; margin-top: 1.5rem; display: block; text-align: center;">Book Now</a>
+                {% endif %}
+            </div>
+
+            <a href="{{ url_for('main.index') }}" class="btn-secondary"
+                style="width: 100%; margin-top: 1rem; display: block; text-align: center;">
+                <i class="fas fa-arrow-left"></i> Back to Events
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .event-details-container {
+        padding-bottom: 3rem;
+    }
+
+    .event-hero {
+        position: relative;
+        height: 400px;
+        background-size: cover;
+        background-position: center;
+        border-radius: 20px;
+        margin-bottom: 2rem;
+        display: flex;
+        align-items: flex-end;
+        overflow: hidden;
+        border: 1px solid var(--glass-border);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .hero-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to top, rgba(10, 5, 15, 0.95), rgba(10, 5, 15, 0.4), transparent);
+        z-index: 1;
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 2;
+        padding: 3rem;
+        width: 100%;
+    }
+
+    .hero-content h1 {
+        font-size: 3rem;
+        font-weight: 800;
+        margin: 1rem 0;
+        text-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    }
+
+    .hero-meta {
+        display: flex;
+        gap: 2rem;
+        font-size: 1.1rem;
+        color: rgba(255, 255, 255, 0.8);
+    }
+
+    .hero-meta span {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .hero-meta i {
+        color: var(--primary-color);
+    }
+
+    .badge {
+        padding: 0.4rem 1rem;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .badge-live {
+        background: rgba(0, 255, 100, 0.15);
+        border: 1px solid var(--secondary-color);
+        color: var(--secondary-color);
+    }
+
+    .badge-past {
+        background: rgba(255, 0, 50, 0.15);
+        border: 1px solid var(--primary-color);
+        color: var(--primary-color);
+    }
+
+    .details-grid {
+        display: grid;
+        grid-template-columns: 1fr 350px;
+        gap: 2rem;
+    }
+
+    .description-text {
+        line-height: 1.8;
+        font-size: 1.1rem;
+        opacity: 0.9;
+        color: #eee;
+    }
+
+    .price-card {
+        padding: 2rem;
+        position: sticky;
+        top: 2rem;
+    }
+
+    .price-header {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid var(--glass-border);
+    }
+
+    .price-header .label {
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        opacity: 0.6;
+    }
+
+    .price-header .price {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: #fff;
+        text-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+    }
+
+    .info-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1.2rem;
+    }
+
+    .info-item {
+        display: flex;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+
+    .info-item i {
+        color: var(--primary-color);
+        font-size: 1.2rem;
+        margin-top: 0.2rem;
+        width: 20px;
+        text-align: center;
+    }
+
+    .info-label {
+        display: block;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        opacity: 0.5;
+        letter-spacing: 0.5px;
+    }
+
+    .info-value {
+        font-weight: 600;
+        color: #fff;
+    }
+
+    @media (max-width: 992px) {
+        .details-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .price-card {
+            position: static;
+        }
+
+        .hero-content {
+            padding: 1.5rem;
+        }
+
+        .hero-content h1 {
+            font-size: 2rem;
+        }
+
+        .hero-meta {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+    }
+</style>
+{% endblock %}
