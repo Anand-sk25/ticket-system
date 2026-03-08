@@ -89,6 +89,30 @@ def reject_booking(booking_id):
     flash('Booking rejected and seats released.', 'warning')
     return redirect(url_for('admin.dashboard'))
 
+@admin_bp.route('/booking/revoke/<int:booking_id>', methods=['POST'])
+@login_required
+@admin_required
+def revoke_booking(booking_id):
+    booking = Booking.query.get_or_404(booking_id)
+    
+    # Only revoke if confirmed
+    if booking.status != 'confirmed':
+        flash('Only confirmed bookings can be revoked.', 'error')
+        return redirect(url_for('admin.dashboard'))
+        
+    booking.status = 'rejected'
+    
+    # Release seats
+    for ticket in booking.tickets:
+        if ticket.seat_id:
+            seat = Seat.query.get(ticket.seat_id)
+            if seat:
+                seat.status = 'available'
+    
+    db.session.commit()
+    flash(f'Booking for {booking.user.username} has been revoked and tickets cancelled.', 'danger')
+    return redirect(url_for('admin.dashboard'))
+
 @admin_bp.route('/event/new', methods=['GET', 'POST'])
 @login_required
 @admin_required
