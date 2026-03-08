@@ -156,11 +156,9 @@ def create_app():
             db.session.commit()
             print(f"User {admin_email} promoted to Admin.")
 
-        # Check for persistence warning
-        if IS_VERCEL and not DATABASE_URL:
-            app.config['PERSISTENCE_WARNING'] = True
-        else:
-            app.config['PERSISTENCE_WARNING'] = False
+        # Check for persistence warnings
+        app.config['PERSISTENCE_WARNING'] = IS_VERCEL and not DATABASE_URL
+        app.config['IMAGE_PERSISTENCE_WARNING'] = IS_VERCEL
 
     return app
 

@@ -143,7 +143,7 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'success') {
-                    window.location.href = `/book/ticket/${data.booking_id}`;
+                    window.location.href = `/book/pending/${data.booking_id}`;
                 } else {
                     alert('Booking failed. Please try again.');
                 }

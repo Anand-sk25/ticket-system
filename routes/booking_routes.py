@@ -90,10 +90,18 @@ def view_ticket(booking_id):
         return redirect(url_for('main.index'))
     
     if booking.status != 'confirmed' and not current_user.is_admin:
-        flash('Your booking is pending admin approval. Tickets will be available once approved.', 'info')
-        return redirect(url_for('booking.my_bookings'))
+        return redirect(url_for('booking.pending_status', booking_id=booking.id))
         
     return render_template('booking/confirmation.html', booking=booking)
+
+@booking_bp.route('/pending/<int:booking_id>')
+@login_required
+def pending_status(booking_id):
+    booking = Booking.query.get_or_404(booking_id)
+    if booking.user_id != current_user.id and not current_user.is_admin:
+        flash('Unauthorized', 'error')
+        return redirect(url_for('main.index'))
+    return render_template('booking/pending.html', booking=booking)
 
 @booking_bp.route('/my_bookings')
 @login_required
