@@ -355,24 +355,29 @@ def delete_event(event_id):
                 except Exception as e:
                     print(f"Error deleting ticket image file: {e}")
 
-        # 1. First, find all bookings for this event
-        bookings = Booking.query.filter_by(event_id=event.id).all()
-        booking_ids = [b.id for b in bookings]
+        # 1. First, find all seat IDs for this event
+        seat_ids = [s.id for s in Seat.query.filter_by(event_id=event.id).all()]
         
-        # 2. Delete all tickets for these bookings (they reference seats)
-        if booking_ids:
-            Ticket.query.filter(Ticket.booking_id.in_(booking_ids)).delete(synchronize_session=False)
+        # 2. Find all bookings for this event
+        booking_ids = [b.id for b in Booking.query.filter_by(event_id=event.id).all()]
+        
+        # 3. Delete ANY ticket referencing these seats OR belonging to these bookings
+        ticket_query = Ticket.query.filter(
+            (Ticket.seat_id.in_(seat_ids)) | (Ticket.booking_id.in_(booking_ids)) if (seat_ids or booking_ids) else False
+        )
+        if seat_ids or booking_ids:
+            ticket_query.delete(synchronize_session=False)
             
-        # 3. Delete all bookings
+        # 4. Delete bookings
         Booking.query.filter_by(event_id=event.id).delete()
         
-        # 4. Now safe to delete seats
+        # 5. Now safe to delete seats
         Seat.query.filter_by(event_id=event.id).delete()
         
-        # 5. Delete all coupons
+        # 6. Delete all coupons
         Coupon.query.filter_by(event_id=event.id).delete()
 
-        # 6. Finally delete the event
+        # 7. Finally delete the event
         db.session.delete(event)
         db.session.commit()
         
