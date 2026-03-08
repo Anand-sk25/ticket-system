@@ -165,7 +165,13 @@ def new_event():
         flash('Event created successfully!', 'success')
         return redirect(url_for('admin.dashboard'))
 
-    return render_template('admin/event_form.html', event=None)
+    # List persistent images for the gallery
+    persistent_images = []
+    persistent_dir = os.path.join(current_app.root_path, 'static', 'uploads', 'persistent')
+    if os.path.exists(persistent_dir):
+        persistent_images = [f for f in os.listdir(persistent_dir) if allowed_image(f)]
+
+    return render_template('admin/event_form.html', event=None, persistent_images=persistent_images)
 
 @admin_bp.route('/event/edit/<int:event_id>', methods=['GET', 'POST'])
 @login_required
@@ -251,7 +257,13 @@ def edit_event(event_id):
         flash('Event updated successfully!', 'success')
         return redirect(url_for('admin.dashboard'))
         
-    return render_template('admin/event_form.html', event=event)
+    # List persistent images for the gallery
+    persistent_images = []
+    persistent_dir = os.path.join(current_app.root_path, 'static', 'uploads', 'persistent')
+    if os.path.exists(persistent_dir):
+        persistent_images = [f for f in os.listdir(persistent_dir) if allowed_image(f)]
+
+    return render_template('admin/event_form.html', event=event, persistent_images=persistent_images)
 
 @admin_bp.route('/reset_sequences')
 @login_required

@@ -8,15 +8,46 @@
 
     {% if config.IMAGE_PERSISTENCE_WARNING %}
     <div class="card"
-        style="background: rgba(251, 191, 36, 0.1); border: 1px solid #fbbf24; color: #fbbf24; margin-bottom: 2rem; padding: 1rem; border-left: 4px solid #fbbf24;">
-        <i class="fas fa-exclamation-triangle"></i> <strong>Note on Image Uploads:</strong>
-        You are running on Vercel. Images uploaded locally are <strong>temporary</strong> and will disappear after some
-        time.
-        For permanent images, please use the <strong>Image URL</strong> fields below.
+        style="background: rgba(251, 191, 36, 0.1); border: 1px solid #fbbf24; color: #fbbf24; margin-bottom: 2rem; padding: 1.5rem; border-left: 6px solid #fbbf24; border-radius: 12px;">
+        <h3 style="margin-bottom: 0.5rem;"><i class="fas fa-exclamation-triangle"></i> Important: Why images disappear
+        </h3>
+        <p style="font-size: 0.95rem; line-height: 1.5;">
+            1. <strong>UPLOADS:</strong> If you use the "Upload" button, images are only temporary on Vercel.<br>
+            2. <strong>BAD URLS:</strong> If you use a URL like <code>https://share.google/images</code>, it won't work
+            because it's not a direct image.<br>
+            3. <strong>SOLUTION:</strong> Use an image from the <strong>Permanent Gallery</strong> below or a direct
+            image link ending in .jpg/.png.
+        </p>
     </div>
     {% endif %}
 
     <form method="POST" enctype="multipart/form-data">
+        {% if persistent_images %}
+        <div class="form-group"
+            style="margin-bottom: 2.5rem; background: rgba(255,255,255,0.03); padding: 1.5rem; border-radius: 15px; border: 1px solid var(--glass-border);">
+            <label style="color: var(--secondary-color); font-size: 1.1rem; margin-bottom: 1rem;"><i
+                    class="fas fa-images"></i> Permanent Image Gallery</label>
+            <p style="font-size: 0.85rem; opacity: 0.7; margin-bottom: 1rem;">Click an image to set it as your event
+                background. These are 100% permanent.</p>
+            <div class="gallery-grid"
+                style="display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 1rem;">
+                {% for filename in persistent_images %}
+                <div class="gallery-item-wrapper" style="text-align: center;">
+                    <div class="gallery-item"
+                        onclick="selectFromGallery('/static/uploads/persistent/{{ filename }}', this)"
+                        style="cursor: pointer; border-radius: 10px; overflow: hidden; border: 2px solid rgba(255,255,255,0.1); transition: all 0.2s; aspect-ratio: 1; position: relative;">
+                        <img src="/static/uploads/persistent/{{ filename }}" alt="{{ filename }}"
+                            style="width: 100%; height: 100%; object-fit: cover;">
+                        <div class="gallery-hover"
+                            style="position: absolute; inset: 0; background: rgba(0,255,100,0.2); opacity: 0; display: flex; align-items: center; justify-content: center; transition: 0.2s;">
+                            <i class="fas fa-check-circle" style="color: white; font-size: 1.5rem;"></i>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
         <div class="form-group">
             <label for="title">Event Title</label>
             <input type="text" id="title" name="title" required value="{{ event.title if event else '' }}">
@@ -69,32 +100,35 @@
         </div>
 
         <div class="form-group">
-            <label for="image_url">Event Card Image URL (Alternative to upload - stable for Vercel)</label>
+            <label for="image_url">Event Card Image URL <span style="opacity: 0.6; font-weight: normal;">(Enter a direct
+                    link)</span></label>
             <input type="url" id="image_url" name="image_url" placeholder="https://example.com/image.jpg"
                 value="{{ event.image_url if event and event.image_url else '' }}"
                 oninput="previewUrl(this, 'image-preview', 'main-preview-container')">
         </div>
 
         <div class="form-group">
-            <label for="image">Or Upload Event Card Image</label>
+            <label for="image">Or Upload <span style="color: #fb7185;">(Temporary - Disappears soon)</span></label>
             <input type="file" id="image" name="image" accept="image/*"
                 onchange="previewImage(this, 'image-preview', 'main-preview-container')">
 
             <div id="main-preview-container"
                 style="margin-top: 1rem; {% if not (event and (event.image_filename or event.image_url)) %}display: none;{% endif %}">
-                <p style="margin-bottom: 0.5rem; font-size: 0.9rem; opacity: 0.7;">Image Preview:</p>
+                <p style="margin-bottom: 0.5rem; font-size: 0.9rem; opacity: 0.7;">Selected Background Preview:</p>
                 {% if event and event.image_url %}
                 <img id="image-preview" src="{{ event.image_url }}" alt="Preview"
-                    style="max-width: 200px; border-radius: 8px; border: 1px solid var(--glass-border);">
+                    style="max-width: 250px; border-radius: 12px; border: 2px solid var(--primary-color); box-shadow: 0 0 20px rgba(255,0,50,0.2);">
                 {% elif event and event.image_filename %}
                 <img id="image-preview" src="{{ url_for('main.uploaded_file', filename=event.image_filename) }}"
-                    alt="Preview" style="max-width: 200px; border-radius: 8px; border: 1px solid var(--glass-border);">
+                    alt="Preview"
+                    style="max-width: 250px; border-radius: 12px; border: 2px solid var(--primary-color);">
                 {% else %}
                 <img id="image-preview" src="#" alt="Preview"
-                    style="max-width: 200px; border-radius: 8px; border: 1px solid var(--glass-border);">
+                    style="max-width: 250px; border-radius: 12px; border: 2px solid var(--primary-color);">
                 {% endif %}
                 <p id="image-error" style="color: #fb7185; font-size: 0.8rem; margin-top: 0.5rem; display: none;">
-                    Invalid image URL or file.</p>
+                    <i class="fas fa-times-circle"></i> This link is not a valid image or is blocked.
+                </p>
             </div>
         </div>
 
@@ -128,6 +162,23 @@
         </div>
 
         <script>
+            function selectFromGallery(url, element) {
+                const urlInput = document.getElementById('image_url');
+                urlInput.value = url;
+                previewUrl(urlInput, 'image-preview', 'main-preview-container');
+
+                // Visual feedback for selection
+                document.querySelectorAll('.gallery-item').forEach(item => {
+                    item.style.borderColor = 'rgba(255,255,255,0.1)';
+                    item.querySelector('.gallery-hover').style.opacity = '0';
+                });
+                element.style.borderColor = 'var(--secondary-color)';
+                element.querySelector('.gallery-hover').style.opacity = '1';
+
+                // Clear file input if any
+                document.getElementById('image').value = "";
+            }
+
             function previewImage(input, previewId, containerId) {
                 const preview = document.getElementById(previewId);
                 const container = document.getElementById(containerId);
@@ -162,6 +213,17 @@
                 }
             }
         </script>
+
+        <style>
+            .gallery-item:hover {
+                transform: scale(1.05);
+                border-color: var(--secondary-color) !important;
+            }
+
+            .gallery-item:hover .gallery-hover {
+                opacity: 0.4 !important;
+            }
+        </style>
 
         <button type="submit" class="btn-primary">{% if event %}Update Event{% else %}Create Event{% endif %}</button>
         <a href="{{ url_for('admin.dashboard') }}" class="btn-secondary">Cancel</a>
