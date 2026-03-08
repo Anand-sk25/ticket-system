@@ -192,39 +192,39 @@ def edit_event(event_id):
             current_seats = Seat.query.filter_by(event_id=event.id).order_by(Seat.id).all()
             current_count = len(current_seats)
 
-        if new_total_seats > current_count:
-            diff = new_total_seats - current_count
-            cols = 10
-            r = current_count // cols
-            c_start = (current_count % cols) + 1
-            
-            def get_row_label(idx):
-                res = ""
-                while idx >= 0:
-                    res = chr(65 + (idx % 26)) + res
-                    idx = (idx // 26) - 1
-                return res
-            
-            total_added = 0
-            while total_added < diff:
-                row_label = get_row_label(r)
-                for c in range(c_start, cols + 1):
-                    if total_added >= diff:
-                        break
-                    seat = Seat(event_id=event.id, row=row_label, number=c, status='available')
-                    db.session.add(seat)
-                    total_added += 1
-                r += 1
-                c_start = 1
+            if new_total_seats > current_count:
+                diff = new_total_seats - current_count
+                cols = 10
+                r = current_count // cols
+                c_start = (current_count % cols) + 1
                 
-        elif new_total_seats < current_count:
-            excess = current_count - new_total_seats
-            for seat in reversed(current_seats):
-                if excess <= 0:
-                    break
-                if seat.status == 'available':
-                    db.session.delete(seat)
-                    excess -= 1
+                def get_row_label(idx):
+                    res = ""
+                    while idx >= 0:
+                        res = chr(65 + (idx % 26)) + res
+                        idx = (idx // 26) - 1
+                    return res
+                
+                total_added = 0
+                while total_added < diff:
+                    row_label = get_row_label(r)
+                    for c in range(c_start, cols + 1):
+                        if total_added >= diff:
+                            break
+                        seat = Seat(event_id=event.id, row=row_label, number=c, status='available')
+                        db.session.add(seat)
+                        total_added += 1
+                    r += 1
+                    c_start = 1
+                    
+            elif new_total_seats < current_count:
+                excess = current_count - new_total_seats
+                for seat in reversed(current_seats):
+                    if excess <= 0:
+                        break
+                    if seat.status == 'available':
+                        db.session.delete(seat)
+                        excess -= 1
                 if excess > 0:
                     flash(f'Could only remove {current_count - new_total_seats - excess} seats because others are booked. {excess} more need to be cancelled first.', 'warning')
                     new_total_seats = current_count - excess
