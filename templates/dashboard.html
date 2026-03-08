@@ -33,13 +33,20 @@
                 {% for booking in user.bookings|sort(attribute='booking_date', reverse=True) %}
                 <tr style="border-bottom: 1px solid var(--glass-border);">
                     <td style="padding: 1rem; font-weight: bold;">{{ booking.event.title }}</td>
-                    <td style="padding: 1rem;">{{ booking.event.date_time.strftime('%b %d, %Y %I:%M %p') }}</td>
+                    <td style="padding: 1rem;">{{ booking.event.date_time.strftime('%b %d, %Y') }}</td>
                     <td style="padding: 1rem;">{{ booking.event.venue }}</td>
                     <td style="padding: 1rem;">{{ booking.tickets|length }}</td>
                     <td style="padding: 1rem;">₹{{ booking.total_amount }}</td>
                     <td style="padding: 1rem;">
-                        <a href="{{ url_for('booking.view_ticket', booking_id=booking.id) }}" class="btn-secondary"
-                            style="padding: 0.4rem 0.8rem; font-size: 0.9rem;">View Ticket</a>
+                        {% if booking.status == 'confirmed' %}
+                        <a href="{{ url_for('booking.view_ticket', booking_id=booking.id) }}" class="btn-primary"
+                            style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">View Ticket</a>
+                        {% elif booking.status == 'pending' %}
+                        <span style="color: #fbbf24; font-size: 0.8rem;"><i class="fas fa-clock"></i> Pending</span>
+                        {% else %}
+                        <span style="color: #fb7185; font-size: 0.8rem;"><i class="fas fa-times-circle"></i>
+                            Rejected</span>
+                        {% endif %}
                     </td>
                 </tr>
                 {% endfor %}

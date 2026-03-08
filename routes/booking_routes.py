@@ -51,20 +51,27 @@ def confirm_booking():
     
     # Create Tickets and update Seat status
     for seat_label in selected_seats:
-        # Parse seat label (e.g. "A1")
-        row_label = seat_label[0]
-        seat_num = int(seat_label[1:])
-        
-        # Update Seat status in DB
+        seat = None
+        current_seat_label = seat_label
+
         if event.is_seated:
-            seat = Seat.query.filter_by(event_id=event.id, row=row_label, number=seat_num).first()
-            if seat:
-                if seat.status == 'booked':
-                    return jsonify({'status': 'error', 'message': f'Seat {seat_label} is already booked.'}), 400
-                seat.status = 'booked'
+            try:
+                # Parse seat label (e.g. "A1")
+                row_label = seat_label[0]
+                seat_num = int(seat_label[1:])
+                
+                # Update Seat status in DB
+                seat = Seat.query.filter_by(event_id=event.id, row=row_label, number=seat_num).first()
+                if seat:
+                    if seat.status == 'booked':
+                        db.session.rollback()
+                        return jsonify({'status': 'error', 'message': f'Seat {seat_label} is already booked.'}), 400
+                    seat.status = 'booked'
+            except (IndexError, ValueError):
+                # Fallback if parsing fails for some reason
+                current_seat_label = "Seated"
         else:
-            seat = None
-            seat_label = "General Admission"
+            current_seat_label = "General Admission"
         
         # Generate unique code
         unique_code = str(uuid.uuid4()).split('-')[0].upper()
@@ -73,7 +80,7 @@ def confirm_booking():
             booking_id=booking.id,
             unique_code=unique_code,
             seat_id=seat.id if seat else None,
-            seat_number=seat_label
+            seat_number=current_seat_label
         )
         db.session.add(ticket)
         
