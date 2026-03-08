@@ -27,14 +27,14 @@ class Event(db.Model):
     is_seated = db.Column(db.Boolean, default=True)
     ticket_image_filename = db.Column(db.String(200), nullable=True)
     ticket_image_url = db.Column(db.String(500), nullable=True)
-    # We will manage seats dynamically or via Seat model if specific seat locking is required
+    # Relationships with explicit cascade behavior
     seats = db.relationship('Seat', backref='event', lazy=True, cascade='all, delete-orphan')
     coupons = db.relationship('Coupon', backref='event', lazy=True, cascade='all, delete-orphan')
     bookings = db.relationship('Booking', backref='event', lazy=True, cascade='all, delete-orphan')
 
 class Seat(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=False)
+    event_id = db.Column(db.Integer, db.ForeignKey('event.id', ondelete='CASCADE'), nullable=False)
     row = db.Column(db.String(5), nullable=False)
     number = db.Column(db.Integer, nullable=False)
     status = db.Column(db.String(20), default='available') # available, booked, locked
@@ -43,7 +43,7 @@ class Seat(db.Model):
 class Booking(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=False)
+    event_id = db.Column(db.Integer, db.ForeignKey('event.id', ondelete='CASCADE'), nullable=False)
     booking_date = db.Column(db.DateTime, default=datetime.utcnow)
     total_amount = db.Column(db.Float, nullable=False)
     status = db.Column(db.String(20), default='pending')
@@ -51,8 +51,8 @@ class Booking(db.Model):
 
 class Ticket(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    booking_id = db.Column(db.Integer, db.ForeignKey('booking.id'), nullable=False)
-    seat_id = db.Column(db.Integer, db.ForeignKey('seat.id'), nullable=True) # Optional if open seating
+    booking_id = db.Column(db.Integer, db.ForeignKey('booking.id', ondelete='CASCADE'), nullable=False)
+    seat_id = db.Column(db.Integer, db.ForeignKey('seat.id', ondelete='SET NULL'), nullable=True) # Optional if open seating
     seat_number = db.Column(db.String(10), nullable=True) # e.g. "A1"
     unique_code = db.Column(db.String(100), unique=True, nullable=False)
     is_scanned = db.Column(db.Boolean, default=False)
@@ -66,5 +66,5 @@ class Coupon(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     code = db.Column(db.String(50), unique=True, nullable=False)
     discount_percent = db.Column(db.Float, nullable=False)
-    event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=True) # Null means global coupon
+    event_id = db.Column(db.Integer, db.ForeignKey('event.id', ondelete='CASCADE'), nullable=True) # Null means global coupon
     is_active = db.Column(db.Boolean, default=True)
