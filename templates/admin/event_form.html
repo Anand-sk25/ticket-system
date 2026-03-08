@@ -71,52 +71,60 @@
         <div class="form-group">
             <label for="image_url">Event Card Image URL (Alternative to upload - stable for Vercel)</label>
             <input type="url" id="image_url" name="image_url" placeholder="https://example.com/image.jpg"
-                value="{{ event.image_url if event and event.image_url else '' }}">
+                value="{{ event.image_url if event and event.image_url else '' }}"
+                oninput="previewUrl(this, 'image-preview', 'main-preview-container')">
         </div>
 
         <div class="form-group">
             <label for="image">Or Upload Event Card Image</label>
             <input type="file" id="image" name="image" accept="image/*"
-                onchange="previewImage(this, 'image-preview', 'new-preview-container')">
-            {% if event and event.image_filename %}
-            <div style="margin-top: 1rem;">
-                <p style="margin-bottom: 0.5rem; font-size: 0.9rem; opacity: 0.7;">Current Image:</p>
+                onchange="previewImage(this, 'image-preview', 'main-preview-container')">
+
+            <div id="main-preview-container"
+                style="margin-top: 1rem; {% if not (event and (event.image_filename or event.image_url)) %}display: none;{% endif %}">
+                <p style="margin-bottom: 0.5rem; font-size: 0.9rem; opacity: 0.7;">Image Preview:</p>
+                {% if event and event.image_url %}
+                <img id="image-preview" src="{{ event.image_url }}" alt="Preview"
+                    style="max-width: 200px; border-radius: 8px; border: 1px solid var(--glass-border);">
+                {% elif event and event.image_filename %}
                 <img id="image-preview" src="{{ url_for('main.uploaded_file', filename=event.image_filename) }}"
                     alt="Preview" style="max-width: 200px; border-radius: 8px; border: 1px solid var(--glass-border);">
-            </div>
-            {% else %}
-            <div id="new-preview-container" style="margin-top: 1rem; display: none;">
-                <p style="margin-bottom: 0.5rem; font-size: 0.9rem; opacity: 0.7;">New Image Preview:</p>
+                {% else %}
                 <img id="image-preview" src="#" alt="Preview"
                     style="max-width: 200px; border-radius: 8px; border: 1px solid var(--glass-border);">
+                {% endif %}
+                <p id="image-error" style="color: #fb7185; font-size: 0.8rem; margin-top: 0.5rem; display: none;">
+                    Invalid image URL or file.</p>
             </div>
-            {% endif %}
         </div>
 
         <div class="form-group">
             <label for="ticket_image_url">Ticket Background URL (Alternative to upload - stable for Vercel)</label>
             <input type="url" id="ticket_image_url" name="ticket_image_url" placeholder="https://example.com/ticket.jpg"
-                value="{{ event.ticket_image_url if event and event.ticket_image_url else '' }}">
+                value="{{ event.ticket_image_url if event and event.ticket_image_url else '' }}"
+                oninput="previewUrl(this, 'ticket-preview', 'ticket-preview-container')">
         </div>
 
         <div class="form-group">
             <label for="ticket_image">Or Upload Ticket Background Image</label>
             <input type="file" id="ticket_image" name="ticket_image" accept="image/*"
                 onchange="previewImage(this, 'ticket-preview', 'ticket-preview-container')">
-            {% if event and event.ticket_image_filename %}
-            <div style="margin-top: 1rem;">
-                <p style="margin-bottom: 0.5rem; font-size: 0.9rem; opacity: 0.7;">Current Ticket Image:</p>
+
+            <div id="ticket-preview-container"
+                style="margin-top: 1rem; {% if not (event and (event.ticket_image_filename or event.ticket_image_url)) %}display: none;{% endif %}">
+                <p style="margin-bottom: 0.5rem; font-size: 0.9rem; opacity: 0.7;">Ticket Preview:</p>
+                {% if event and event.ticket_image_url %}
+                <img id="ticket-preview" src="{{ event.ticket_image_url }}" alt="Ticket Preview"
+                    style="max-width: 200px; border-radius: 8px; border: 1px solid var(--glass-border);">
+                {% elif event and event.ticket_image_filename %}
                 <img id="ticket-preview" src="{{ url_for('main.uploaded_file', filename=event.ticket_image_filename) }}"
                     alt="Ticket Preview"
                     style="max-width: 200px; border-radius: 8px; border: 1px solid var(--glass-border);">
-            </div>
-            {% else %}
-            <div id="ticket-preview-container" style="margin-top: 1rem; display: none;">
-                <p style="margin-bottom: 0.5rem; font-size: 0.9rem; opacity: 0.7;">New Ticket Image Preview:</p>
+                {% else %}
                 <img id="ticket-preview" src="#" alt="Ticket Preview"
                     style="max-width: 200px; border-radius: 8px; border: 1px solid var(--glass-border);">
+                {% endif %}
             </div>
-            {% endif %}
         </div>
 
         <script>
@@ -132,6 +140,25 @@
                         }
                     }
                     reader.readAsDataURL(input.files[0]);
+                }
+            }
+
+            function previewUrl(input, previewId, containerId) {
+                const preview = document.getElementById(previewId);
+                const container = document.getElementById(containerId);
+                if (input.value && input.value.trim() !== "") {
+                    preview.src = input.value;
+                    if (container) container.style.display = 'block';
+
+                    // Optional: handle broken links
+                    preview.onerror = function () {
+                        const error = document.getElementById(previewId === 'image-preview' ? 'image-error' : 'ticket-error');
+                        if (error) error.style.display = 'block';
+                    };
+                    preview.onload = function () {
+                        const error = document.getElementById(previewId === 'image-preview' ? 'image-error' : 'ticket-error');
+                        if (error) error.style.display = 'none';
+                    };
                 }
             }
         </script>
