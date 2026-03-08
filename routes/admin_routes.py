@@ -336,18 +336,47 @@ def reset_sequences():
 def delete_event(event_id):
     event = Event.query.get_or_404(event_id)
     
-    # Delete image file if it exists
-    if event.image_filename:
-        image_path = os.path.join(current_app.config['UPLOAD_FOLDER'], event.image_filename)
-        if os.path.exists(image_path):
-            try:
-                os.remove(image_path)
-            except Exception as e:
-                print(f"Error deleting image file: {e}")
+    try:
+        # Delete image file if it exists
+        if event.image_filename:
+            image_path = os.path.join(current_app.config['UPLOAD_FOLDER'], event.image_filename)
+            if os.path.exists(image_path):
+                try:
+                    os.remove(image_path)
+                except Exception as e:
+                    print(f"Error deleting event image file: {e}")
 
-    db.session.delete(event)
-    db.session.commit()
-    flash('Event deleted.', 'success')
+        # Delete ticket background if it exists
+        if event.ticket_image_filename:
+            ticket_image_path = os.path.join(current_app.config['UPLOAD_FOLDER'], event.ticket_image_filename)
+            if os.path.exists(ticket_image_path):
+                try:
+                    os.remove(ticket_image_path)
+                except Exception as e:
+                    print(f"Error deleting ticket image file: {e}")
+
+        # Manual cleanup of related objects just in case cascade fails on Vercel
+        # Delete all seats
+        Seat.query.filter_by(event_id=event.id).delete()
+        # Delete all coupons
+        Coupon.query.filter_by(event_id=event.id).delete()
+        
+        # Delete all bookings (this will naturally delete tickets due to cascades, but we can be explicit if needed)
+        bookings = Booking.query.filter_by(event_id=event.id).all()
+        for b in bookings:
+            Ticket.query.filter_by(booking_id=b.id).delete()
+            db.session.delete(b)
+
+        # Finally delete the event
+        db.session.delete(event)
+        db.session.commit()
+        
+        flash('Event and all related data deleted successfully.', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error deleting event: {str(e)}', 'error')
+        print(f"CRITICAL: Event deletion failed: {e}")
+
     return redirect(url_for('admin.dashboard'))
 
 @admin_bp.route('/users')
