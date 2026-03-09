@@ -144,7 +144,11 @@
 </div>
 
 <div class="card" style="margin-bottom: 2rem;">
-    <h2 style="margin-bottom: 1rem;">Recent Purchases & Scans</h2>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h2 style="margin: 0;">Recent Purchases & Scans</h2>
+        <a href="{{ url_for('admin.all_tickets') }}" class="btn-secondary"
+            style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">View All Tickets</a>
+    </div>
     <div class="table-responsive">
         <table style="width: 100%; border-collapse: collapse; min-width: 600px;">
             <thead style="background: rgba(255,255,255,0.05);">

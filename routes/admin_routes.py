@@ -411,3 +411,18 @@ def toggle_admin(user_id):
     status = "promoted to Admin" if user.is_admin else "demoted to User"
     flash(f'User {user.username} has been {status}.', 'success')
     return redirect(url_for('admin.manage_users'))
+
+@admin_bp.route('/tickets')
+@login_required
+@admin_required
+def all_tickets():
+    # Fetch all tickets with joins for full details
+    tickets = db.session.query(Ticket, Booking, Event, User).join(
+        Booking, Ticket.booking_id == Booking.id
+    ).join(
+        Event, Booking.event_id == Event.id
+    ).join(
+        User, Booking.user_id == User.id
+    ).order_by(Ticket.generated_at.desc()).all()
+    
+    return render_template('admin/all_tickets.html', tickets=tickets)

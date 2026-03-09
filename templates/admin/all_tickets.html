@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}All Tickets - Admin{% endblock %}
+
+{% block content %}
+<div
+    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+    <h1>All User Tickets</h1>
+    <div style="display: flex; gap: 1rem;">
+        <a href="{{ url_for('admin.dashboard') }}" class="btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+</div>
+
+<div class="card" style="margin-bottom: 2rem;">
+    <div style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 1rem;">
+        <div style="position: relative; flex-grow: 1;">
+            <i class="fas fa-search"
+                style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.4);"></i>
+            <input type="text" id="ticketSearch" placeholder="Search by Ticket Code, Member Name, or Event..."
+                style="width: 100%; padding: 0.8rem 1rem 0.8rem 3rem; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 8px; color: white; outline: none;">
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table style="width: 100%; border-collapse: collapse; min-width: 800px;" id="ticketsTable">
+            <thead style="background: rgba(255,255,255,0.05);">
+                <tr>
+                    <th style="padding: 1rem; text-align: left;">Code</th>
+                    <th style="padding: 1rem; text-align: left;">Member</th>
+                    <th style="padding: 1rem; text-align: left;">Event</th>
+                    <th style="padding: 1rem; text-align: left;">Seat</th>
+                    <th style="padding: 1rem; text-align: left;">Status</th>
+                    <th style="padding: 1rem; text-align: left;">Generated At</th>
+                    <th style="padding: 1rem; text-align: left;">Scanned At</th>
+                    <th style="padding: 1rem; text-align: left;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ticket, booking, event, user in tickets %}
+                <tr style="border-bottom: 1px solid var(--glass-border);">
+                    <td style="padding: 1rem; font-family: monospace; color: var(--primary-color);">{{
+                        ticket.unique_code }}</td>
+                    <td style="padding: 1rem;">
+                        <div style="font-weight: 500;">{{ user.username }}</div>
+                        <div style="font-size: 0.8rem; color: rgba(255,255,255,0.5);">{{ user.email }}</div>
+                    </td>
+                    <td style="padding: 1rem;">{{ event.title }}</td>
+                    <td style="padding: 1rem;">{{ ticket.seat_number or 'N/A' }}</td>
+                    <td style="padding: 1rem;">
+                        {% if ticket.is_scanned %}
+                        <span
+                            style="color: #4ade80; background: rgba(74, 222, 128, 0.1); padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.85rem;">
+                            <i class="fas fa-check-circle"></i> Scanned
+                        </span>
+                        {% else %}
+                        <span
+                            style="color: #fca5a5; background: rgba(252, 165, 165, 0.1); padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.85rem;">
+                            <i class="fas fa-times-circle"></i> Unscanned
+                        </span>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 1rem; font-size: 0.9rem;">{{ ticket.generated_at.strftime('%Y-%m-%d %H:%M') if
+                        ticket.generated_at else '-' }}</td>
+                    <td style="padding: 1rem; font-size: 0.9rem;">{{ ticket.scanned_at.strftime('%Y-%m-%d %H:%M') if
+                        ticket.scanned_at else '-' }}</td>
+                    <td style="padding: 1rem;">
+                        {% if booking.status == 'confirmed' %}
+                        <form action="{{ url_for('admin.revoke_booking', booking_id=booking.id) }}" method="POST"
+                            style="display: inline;">
+                            <button type="submit" class="btn-secondary"
+                                style="padding: 0.3rem 0.6rem; font-size: 0.75rem; background: rgba(239, 68, 68, 0.1); border-color: #ef4444; color: #fca5a5;"
+                                onclick="return confirm('Revoke this ticket? This will cancel the seat and invalidate the QR code.')">
+                                Revoke
+                            </button>
+                        </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="8" style="padding: 2rem; text-align: center; color: rgba(255,255,255,0.4);">No tickets
+                        found in the system.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    document.getElementById('ticketSearch').addEventListener('keyup', function () {
+        const searchText = this.value.toLowerCase();
+        const table = document.getElementById('ticketsTable');
+        const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+
+        for (let row of rows) {
+            if (row.cells.length < 3) continue;
+            const text = row.textContent.toLowerCase();
+            if (text.includes(searchText)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        }
+    });
+</script>
+{% endblock %}
