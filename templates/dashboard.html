@@ -80,8 +80,8 @@
             <p style="font-weight: 500;">{{ user.phone or 'Not provided' }}</p>
         </div>
         <div>
-            <span style="opacity: 0.7; font-size: 0.9rem;">Semester/Dept</span>
-            <p style="font-weight: 500;">{{ user.semester }} / {{ user.department }}</p>
+            <span style="opacity: 0.7; font-size: 0.9rem;">Role/Dept</span>
+            <p style="font-weight: 500;">{{ user.role or user.semester }} / {{ user.department }}</p>
         </div>
     </div>
 </div>

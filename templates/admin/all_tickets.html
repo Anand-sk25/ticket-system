@@ -45,6 +45,9 @@
                     <td style="padding: 1rem;">
                         <div style="font-weight: 500;">{{ user.username }}</div>
                         <div style="font-size: 0.8rem; color: rgba(255,255,255,0.5);">{{ user.email }}</div>
+                        <div style="font-size: 0.75rem; margin-top: 0.25rem;"><span
+                                style="color: #60a5fa; background: rgba(59, 130, 246, 0.1); padding: 0.1rem 0.4rem; border-radius: 3px;">{{
+                                user.role or 'N/A' }}</span></div>
                     </td>
                     <td style="padding: 1rem;">{{ event.title }}</td>
                     <td style="padding: 1rem;">{{ ticket.seat_number or 'N/A' }}</td>

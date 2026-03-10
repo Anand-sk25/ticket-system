@@ -40,17 +40,38 @@
 
             <div class="form-group flex-group">
                 <div class="input-wrapper">
-                    <label for="semester">Semester</label>
+                    <label for="role">Role</label>
                     <div class="input-icon">
-                        <i class="fas fa-graduation-cap"></i>
-                        <input type="text" id="semester" name="semester" placeholder="e.g. Sem 6" required>
+                        <i class="fas fa-user-tag"></i>
+                        <select id="role" name="role" required
+                            style="width: 100%; background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 0.85rem 1rem 0.85rem 2.8rem; color: #fff; font-family: inherit; font-size: 0.95rem; appearance: none; -webkit-appearance: none;">
+                            <option value="" disabled selected>Select Role</option>
+                            <option value="Student">Student</option>
+                            <option value="Lecturer">Lecturer</option>
+                        </select>
+                        <i class="fas fa-chevron-down"
+                            style="position: absolute; right: 1rem; left: auto; font-size: 0.8rem; pointer-events: none;"></i>
                     </div>
                 </div>
                 <div class="input-wrapper">
                     <label for="department">Department</label>
                     <div class="input-icon">
                         <i class="fas fa-building"></i>
-                        <input type="text" id="department" name="department" placeholder="e.g. Engineering" required>
+                        <select id="department" name="department" required
+                            style="width: 100%; background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 0.85rem 1rem 0.85rem 2.8rem; color: #fff; font-family: inherit; font-size: 0.95rem; appearance: none; -webkit-appearance: none;">
+                            <option value="" disabled selected>Select Department</option>
+                            <option value="MECH">MECH</option>
+                            <option value="CSE">CSE</option>
+                            <option value="CT">CT</option>
+                            <option value="AI">AI</option>
+                            <option value="EC">EC</option>
+                            <option value="CE">CE</option>
+                            <option value="AU">AU</option>
+                            <option value="EEE">EEE</option>
+                            <option value="EVT">EVT</option>
+                        </select>
+                        <i class="fas fa-chevron-down"
+                            style="position: absolute; right: 1rem; left: auto; font-size: 0.8rem; pointer-events: none;"></i>
                     </div>
                 </div>
             </div>

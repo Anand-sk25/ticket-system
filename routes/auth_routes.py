@@ -19,7 +19,7 @@ def register():
         username = request.form.get('username')
         email = request.form.get('email')
         password = request.form.get('password')
-        semester = request.form.get('semester')
+        role = request.form.get('role')
         department = request.form.get('department')
         phone = request.form.get('phone')
 
@@ -45,7 +45,7 @@ def register():
             'username': username,
             'email': email,
             'password_hash': generate_password_hash(password),
-            'semester': semester,
+            'role': role,
             'department': department,
             'phone': phone,
             'otp': otp
@@ -80,7 +80,7 @@ def verify_otp():
                 username=reg_data['username'], 
                 email=reg_data['email'], 
                 password_hash=reg_data['password_hash'],
-                semester=reg_data['semester'],
+                role=reg_data['role'],
                 department=reg_data['department'],
                 phone=reg_data['phone']
             )

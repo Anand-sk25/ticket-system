@@ -9,6 +9,7 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(200), nullable=False)
     phone = db.Column(db.String(20), nullable=True)
     semester = db.Column(db.String(100), nullable=True)
+    role = db.Column(db.String(50), nullable=True) # Student, Lecturer, Admin
     department = db.Column(db.String(100), nullable=True)
     is_admin = db.Column(db.Boolean, default=False)
     bookings = db.relationship('Booking', backref='user', lazy=True)

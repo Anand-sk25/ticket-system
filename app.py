@@ -97,6 +97,8 @@ def create_app():
                     db.session.execute(db.text('ALTER TABLE "user" ADD COLUMN phone VARCHAR(20)'))
                 if 'department' not in user_cols:
                     db.session.execute(db.text('ALTER TABLE "user" ADD COLUMN department VARCHAR(100)'))
+                if 'role' not in user_cols:
+                    db.session.execute(db.text('ALTER TABLE "user" ADD COLUMN role VARCHAR(50)'))
                 
                 # Migrate Event table
                 event_cols = [c['name'] for c in inspector.get_columns('event')]
@@ -154,7 +156,7 @@ def create_app():
                 email=admin_email,
                 password_hash=generate_password_hash(admin_password),
                 is_admin=True,
-                semester='Admin',
+                role='Admin',
                 department='Administration'
             )
             db.session.add(new_admin)

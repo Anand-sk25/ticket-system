@@ -29,7 +29,7 @@ def create_admin():
             email=email,
             password_hash=generate_password_hash(password),
             is_admin=True,
-            semester='Admin',
+            role='Admin',
             department='Administration'
         )
         
